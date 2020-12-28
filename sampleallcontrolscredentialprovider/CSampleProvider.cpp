@@ -15,6 +15,7 @@
 #include "CSampleProvider.h"
 #include "CSampleCredential.h"
 #include "guid.h"
+#include "Utils.h"
 
 // CSampleProvider ////////////////////////////////////////////////////////
 
@@ -24,6 +25,8 @@ CSampleProvider::CSampleProvider():
     DllAddRef();
 
     _pCredential = NULL;
+
+	Utils::SetLog(&file_log_);
 }
 
 CSampleProvider::~CSampleProvider()
@@ -33,6 +36,8 @@ CSampleProvider::~CSampleProvider()
         _pCredential->Release();
         _pCredential = NULL;
     }
+
+	Utils::SetLog(NULL);
 
     DllRelease();
 }
@@ -44,6 +49,7 @@ HRESULT CSampleProvider::SetUsageScenario(
     __in DWORD dwFlags
     )
 {
+	Utils::Output(L"CSampleProvider::SetUsageScenario");
     UNREFERENCED_PARAMETER(dwFlags);
     HRESULT hr;
 
@@ -109,6 +115,7 @@ HRESULT CSampleProvider::SetSerialization(
     __in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs
     )
 {
+	Utils::Output(L"CSampleProvider::SetSerialization");
     UNREFERENCED_PARAMETER(pcpcs);
     return E_NOTIMPL;
 }
@@ -120,6 +127,7 @@ HRESULT CSampleProvider::Advise(
     __in UINT_PTR upAdviseContext
     )
 {
+	Utils::Output(L"CSampleProvider::Advise");
     UNREFERENCED_PARAMETER(pcpe);
     UNREFERENCED_PARAMETER(upAdviseContext);
 
@@ -129,6 +137,7 @@ HRESULT CSampleProvider::Advise(
 // Called by LogonUI when the ICredentialProviderEvents callback is no longer valid.
 HRESULT CSampleProvider::UnAdvise()
 {
+	Utils::Output(L"CSampleProvider::UnAdvise");
     return E_NOTIMPL;
 }
 
@@ -142,6 +151,7 @@ HRESULT CSampleProvider::GetFieldDescriptorCount(
     __out DWORD* pdwCount
     )
 {
+	Utils::Output(L"CSampleProvider::GetFieldDescriptorCount");
     *pdwCount = SFI_NUM_FIELDS;
     return S_OK;
 }
@@ -152,6 +162,7 @@ HRESULT CSampleProvider::GetFieldDescriptorAt(
     __deref_out CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR** ppcpfd
     )
 {    
+	Utils::Output(L"CSampleProvider::GetFieldDescriptorAt");
     HRESULT hr;
 
     // Verify dwIndex is a valid field.
@@ -180,6 +191,7 @@ HRESULT CSampleProvider::GetCredentialCount(
     __out BOOL* pbAutoLogonWithDefault
     )
 {
+	Utils::Output(L"CSampleProvider::GetCredentialCount");
     *pdwCount = 1;
     *pdwDefault = 0;
     *pbAutoLogonWithDefault = FALSE;
@@ -193,6 +205,7 @@ HRESULT CSampleProvider::GetCredentialAt(
     __deref_out ICredentialProviderCredential** ppcpc
     )
 {
+	Utils::Output(L"CSampleProvider::GetCredentialAt");
     HRESULT hr;
     if((dwIndex == 0) && ppcpc)
     {

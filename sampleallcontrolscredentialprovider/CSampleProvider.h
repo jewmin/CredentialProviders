@@ -13,6 +13,7 @@
 
 #include "CSampleCredential.h"
 #include "helpers.h"
+#include "FileLog.h"
 
 class CSampleProvider : public ICredentialProvider
 {
@@ -66,6 +67,7 @@ class CSampleProvider : public ICredentialProvider
     __override ~CSampleProvider();
     
   private:
+	  Utils::CFileLog file_log_;
     
 private:
     LONG                                    _cRef;            // Used for reference counting.
