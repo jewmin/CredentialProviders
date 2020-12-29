@@ -7,7 +7,6 @@
 #include <wincred.h>
 #include "Utils.h"
 #include "FileLog.h"
-#pragma comment(lib, "Utils.lib")
 
 int main()
 {
@@ -31,6 +30,7 @@ int main()
 	log.SetLogFileNameFormat(L"%d%d%d.log");
 	Utils::Output(L"sksksjdf≤‚ ‘ø›“∂sdfk∂·");
 	Utils::WToA(NULL);
+	Utils::StringFormat(L"≤‚ ‘abc %s %d", L"«∆«∆", 1000);
 	return 0;
 }
 
