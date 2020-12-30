@@ -103,6 +103,9 @@
     <Midl>
       <TargetEnvironment>X64</TargetEnvironment>
     </Midl>
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dll.cpp" />

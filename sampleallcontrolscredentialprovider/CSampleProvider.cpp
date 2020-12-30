@@ -27,6 +27,7 @@ CSampleProvider::CSampleProvider():
     _pCredential = NULL;
 
 	Utils::SetLog(&file_log_);
+	Utils::Output(L"CSampleProvider::CSampleProvider");
 }
 
 CSampleProvider::~CSampleProvider()
@@ -37,6 +38,7 @@ CSampleProvider::~CSampleProvider()
         _pCredential = NULL;
     }
 
+	Utils::Output(L"CSampleProvider::~CSampleProvider");
 	Utils::SetLog(NULL);
 
     DllRelease();
@@ -49,7 +51,7 @@ HRESULT CSampleProvider::SetUsageScenario(
     __in DWORD dwFlags
     )
 {
-	Utils::Output(L"CSampleProvider::SetUsageScenario");
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetUsageScenario cpus: %s, dwFlags: %u", s_CPUS_Strings[cpus], dwFlags));
     UNREFERENCED_PARAMETER(dwFlags);
     HRESULT hr;
 
@@ -115,7 +117,7 @@ HRESULT CSampleProvider::SetSerialization(
     __in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs
     )
 {
-	Utils::Output(L"CSampleProvider::SetSerialization");
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetSerialization pcpcs: %p", pcpcs));
     UNREFERENCED_PARAMETER(pcpcs);
     return E_NOTIMPL;
 }
@@ -127,7 +129,7 @@ HRESULT CSampleProvider::Advise(
     __in UINT_PTR upAdviseContext
     )
 {
-	Utils::Output(L"CSampleProvider::Advise");
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::Advise pcpe: %p, upAdviseContext: %llu", pcpe, upAdviseContext));
     UNREFERENCED_PARAMETER(pcpe);
     UNREFERENCED_PARAMETER(upAdviseContext);
 
@@ -151,8 +153,8 @@ HRESULT CSampleProvider::GetFieldDescriptorCount(
     __out DWORD* pdwCount
     )
 {
-	Utils::Output(L"CSampleProvider::GetFieldDescriptorCount");
     *pdwCount = SFI_NUM_FIELDS;
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetFieldDescriptorCount *pdwCount: %d", *pdwCount));
     return S_OK;
 }
 
@@ -162,7 +164,7 @@ HRESULT CSampleProvider::GetFieldDescriptorAt(
     __deref_out CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR** ppcpfd
     )
 {    
-	Utils::Output(L"CSampleProvider::GetFieldDescriptorAt");
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetFieldDescriptorAt dwIndex: %u", dwIndex));
     HRESULT hr;
 
     // Verify dwIndex is a valid field.
@@ -191,10 +193,10 @@ HRESULT CSampleProvider::GetCredentialCount(
     __out BOOL* pbAutoLogonWithDefault
     )
 {
-	Utils::Output(L"CSampleProvider::GetCredentialCount");
     *pdwCount = 1;
     *pdwDefault = 0;
     *pbAutoLogonWithDefault = FALSE;
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialCount *pdwCount: %d, *pdwDefault: %d, *pbAutoLogonWithDefault: %s", *pdwCount, *pdwDefault, *pbAutoLogonWithDefault ? L"TRUE": L"FALSE"));
     return S_OK;
 }
 
@@ -205,7 +207,7 @@ HRESULT CSampleProvider::GetCredentialAt(
     __deref_out ICredentialProviderCredential** ppcpc
     )
 {
-	Utils::Output(L"CSampleProvider::GetCredentialAt");
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialAt dwIndex: %u", dwIndex));
     HRESULT hr;
     if((dwIndex == 0) && ppcpc)
     {

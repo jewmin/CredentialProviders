@@ -48,8 +48,8 @@ struct FIELD_STATE_PAIR
 static const FIELD_STATE_PAIR s_rgFieldStatePairs[] = 
 {
     { CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },                   // SFI_TILEIMAGE
-    { CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },                   // SFI_LARGE_TEXT
-    { CPFS_DISPLAY_IN_DESELECTED_TILE, CPFIS_NONE    },     // SFI_SMALL_TEXT   
+    { CPFS_DISPLAY_IN_DESELECTED_TILE, CPFIS_NONE },                   // SFI_LARGE_TEXT
+    { CPFS_DISPLAY_IN_BOTH, CPFIS_NONE    },     // SFI_SMALL_TEXT   
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE    },       // SFI_EDIT_TEXT   
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },       // SFI_PASSWORD
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE    },       // SFI_SUBMIT_BUTTON   
@@ -80,4 +80,30 @@ static const PWSTR s_rgComboBoxStrings[] =
     L"First",
     L"Second",
     L"Third",
+};
+
+static const PWSTR s_CPUS_Strings[] = 
+{
+	L"CPUS_INVALID",
+	L"CPUS_LOGON",
+	L"CPUS_UNLOCK_WORKSTATION",
+	L"CPUS_CHANGE_PASSWORD",
+	L"CPUS_CREDUI",
+	L"CPUS_PLAP",
+};
+
+static const PWSTR s_CPFS_Strings[] =
+{
+	L"CPFS_HIDDEN",
+	L"CPFS_DISPLAY_IN_SELECTED_TILE",
+	L"CPFS_DISPLAY_IN_DESELECTED_TILE",
+	L"CPFS_DISPLAY_IN_BOTH",
+};
+
+static const PWSTR s_CPFIS_Strings[] =
+{
+	L"CPFIS_NONE",
+	L"CPFIS_READONLY",
+	L"CPFIS_DISABLED",
+	L"CPFIS_FOCUSED",
 };

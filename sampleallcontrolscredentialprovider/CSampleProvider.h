@@ -67,10 +67,10 @@ class CSampleProvider : public ICredentialProvider
     __override ~CSampleProvider();
     
   private:
-	  Utils::CFileLog file_log_;
     
 private:
     LONG                                    _cRef;            // Used for reference counting.
     CSampleCredential                       *_pCredential;    // Our credential.
     CREDENTIAL_PROVIDER_USAGE_SCENARIO      _cpus;
+	Utils::CFileLog file_log_;
 };

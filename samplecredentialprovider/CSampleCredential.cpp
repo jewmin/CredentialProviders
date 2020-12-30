@@ -15,6 +15,7 @@
 #include <unknwn.h>
 #include "CSampleCredential.h"
 #include "guid.h"
+#include "Utils.h"
 
 // CSampleCredential ////////////////////////////////////////////////////////
 
@@ -22,6 +23,7 @@ CSampleCredential::CSampleCredential():
     _cRef(1),
     _pCredProvCredentialEvents(NULL)
 {
+	Utils::Output(L"CSampleCredential::CSampleCredential");
     DllAddRef();
 
     ZeroMemory(_rgCredProvFieldDescriptors, sizeof(_rgCredProvFieldDescriptors));
@@ -31,6 +33,7 @@ CSampleCredential::CSampleCredential():
 
 CSampleCredential::~CSampleCredential()
 {
+	Utils::Output(L"CSampleCredential::~CSampleCredential");
     if (_rgFieldStrings[SFI_PASSWORD])
     {
         // CoTaskMemFree (below) deals with NULL, but StringCchLength does not.
@@ -57,6 +60,7 @@ HRESULT CSampleCredential::Initialize(
     __in PCWSTR pwzPassword
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::Initialize cpus: %s, pwzUsername: %s, pwzPassword: %s", s_CPUS_Strings[cpus], pwzUsername, pwzPassword));
     HRESULT hr = S_OK;
 
     _cpus = cpus;
@@ -91,6 +95,7 @@ HRESULT CSampleCredential::Advise(
     __in ICredentialProviderCredentialEvents* pcpce
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::Advise pcpce: %p", pcpce));
     if (_pCredProvCredentialEvents != NULL)
     {
         _pCredProvCredentialEvents->Release();
@@ -103,6 +108,7 @@ HRESULT CSampleCredential::Advise(
 // LogonUI calls this to tell us to release the callback.
 HRESULT CSampleCredential::UnAdvise()
 {
+	Utils::Output(L"CSampleCredential::UnAdvise");
     if (_pCredProvCredentialEvents)
     {
         _pCredProvCredentialEvents->Release();
@@ -119,7 +125,8 @@ HRESULT CSampleCredential::UnAdvise()
 // selected, you would do it here.
 HRESULT CSampleCredential::SetSelected(__out BOOL* pbAutoLogon)  
 {
-    *pbAutoLogon = FALSE;  
+    *pbAutoLogon = FALSE;
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::SetSelected *pbAutoLogon: %s", *pbAutoLogon ? L"TRUE" : L"FALSE"));
 
     return S_OK;
 }
@@ -129,6 +136,7 @@ HRESULT CSampleCredential::SetSelected(__out BOOL* pbAutoLogon)
 // is to clear out the password field.
 HRESULT CSampleCredential::SetDeselected()
 {
+	Utils::Output(L"CSampleCredential::SetDeselected");
     HRESULT hr = S_OK;
     if (_rgFieldStrings[SFI_PASSWORD])
     {
@@ -161,11 +169,13 @@ HRESULT CSampleCredential::GetFieldState(
     {
         *pcpfs = _rgFieldStatePairs[dwFieldID].cpfs;
         *pcpfis = _rgFieldStatePairs[dwFieldID].cpfis;
+		Utils::Output(Utils::StringFormat(L"CSampleCredential::GetFieldState dwFieldID: %u, *pcpfs: %s, *pcpfis: %s", dwFieldID, s_CPFS_Strings[*pcpfs], s_CPFIS_Strings[*pcpfis]));
 
         hr = S_OK;
     }
     else
     {
+		Utils::Output(Utils::StringFormat(L"CSampleCredential::GetFieldState dwFieldID: %u", dwFieldID));
         hr = E_INVALIDARG;
     }
     return hr;
@@ -185,9 +195,16 @@ HRESULT CSampleCredential::GetStringValue(
         // Make a copy of the string and return that. The caller
         // is responsible for freeing it.
         hr = SHStrDupW(_rgFieldStrings[dwFieldID], ppwsz);
+		if (*ppwsz) {
+			Utils::Output(Utils::StringFormat(L"CSampleCredential::GetStringValue dwFieldID: %u, *ppwsz: %s", dwFieldID, *ppwsz));
+		}
+		else {
+			Utils::Output(Utils::StringFormat(L"CSampleCredential::GetStringValue dwFieldID: %u", dwFieldID));
+		}
     }
     else
     {
+		Utils::Output(Utils::StringFormat(L"CSampleCredential::GetStringValue dwFieldID: %u", dwFieldID));
         hr = E_INVALIDARG;
     }
 
@@ -200,6 +217,7 @@ HRESULT CSampleCredential::GetBitmapValue(
     __out HBITMAP* phbmp
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::GetBitmapValue dwFieldID: %u", dwFieldID));
     HRESULT hr;
     if ((SFI_TILEIMAGE == dwFieldID) && phbmp)
     {
@@ -231,6 +249,7 @@ HRESULT CSampleCredential::GetSubmitButtonValue(
     __out DWORD* pdwAdjacentTo
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::GetSubmitButtonValue dwFieldID: %u", dwFieldID));
     HRESULT hr;
 
     // Validate parameters.
@@ -254,6 +273,7 @@ HRESULT CSampleCredential::SetStringValue(
     __in PCWSTR pwz      
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::SetStringValue dwFieldID: %u, pwz: %s", dwFieldID, pwz));
     HRESULT hr;
 
     // Validate parameters.
@@ -283,6 +303,7 @@ HRESULT CSampleCredential::GetCheckboxValue(
     __deref_out PWSTR* ppwszLabel
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::GetCheckboxValue dwFieldID: %u", dwFieldID));
     UNREFERENCED_PARAMETER(dwFieldID);
     UNREFERENCED_PARAMETER(pbChecked);
     UNREFERENCED_PARAMETER(ppwszLabel);
@@ -296,6 +317,7 @@ HRESULT CSampleCredential::GetComboBoxValueCount(
     __out_range(<,*pcItems) DWORD* pdwSelectedItem
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::GetComboBoxValueCount dwFieldID: %u", dwFieldID));
     UNREFERENCED_PARAMETER(dwFieldID);
     UNREFERENCED_PARAMETER(pcItems);
     UNREFERENCED_PARAMETER(pdwSelectedItem);
@@ -308,6 +330,7 @@ HRESULT CSampleCredential::GetComboBoxValueAt(
     __deref_out PWSTR* ppwszItem
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::GetComboBoxValueAt dwFieldID: %u, dwItem: %u", dwFieldID, dwItem));
     UNREFERENCED_PARAMETER(dwFieldID);
     UNREFERENCED_PARAMETER(dwItem);
     UNREFERENCED_PARAMETER(ppwszItem);
@@ -319,6 +342,7 @@ HRESULT CSampleCredential::SetCheckboxValue(
     __in BOOL bChecked
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::SetCheckboxValue dwFieldID: %u, bChecked: %s", dwFieldID, bChecked ? L"TRUE" : L"FALSE"));
     UNREFERENCED_PARAMETER(dwFieldID);
     UNREFERENCED_PARAMETER(bChecked);
 
@@ -330,6 +354,7 @@ HRESULT CSampleCredential::SetComboBoxSelectedValue(
     __in DWORD dwSelectedItem
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::SetComboBoxSelectedValue dwFieldID: %u, dwSelectedItem: %u", dwFieldId, dwSelectedItem));
     UNREFERENCED_PARAMETER(dwFieldId);
     UNREFERENCED_PARAMETER(dwSelectedItem);
     return E_NOTIMPL;
@@ -337,6 +362,7 @@ HRESULT CSampleCredential::SetComboBoxSelectedValue(
 
 HRESULT CSampleCredential::CommandLinkClicked(__in DWORD dwFieldID)
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::CommandLinkClicked dwFieldID: %u", dwFieldID));
     UNREFERENCED_PARAMETER(dwFieldID);
     return E_NOTIMPL;
 }
@@ -352,6 +378,7 @@ HRESULT CSampleCredential::GetSerialization(
     __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon
     )
 {
+	Utils::Output(L"CSampleCredential::GetSerialization");
     UNREFERENCED_PARAMETER(ppwszOptionalStatusText);
     UNREFERENCED_PARAMETER(pcpsiOptionalStatusIcon);
 
@@ -433,6 +460,7 @@ HRESULT CSampleCredential::ReportResult(
     __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::ReportResult ntsStatus: %d, ntsSubstatus: %d", ntsStatus, ntsSubstatus));
     *ppwszOptionalStatusText = NULL;
     *pcpsiOptionalStatusIcon = CPSI_NONE;
 
