@@ -75,11 +75,11 @@ HRESULT CSampleCredential::Initialize(
     // Initialize the String value of all the fields. 
     if (SUCCEEDED(hr))
     {
-        hr = SHStrDupW(L"ÒÇÆ÷Ãû", &_rgFieldStrings[SFI_LARGE_TEXT]);
+        hr = SHStrDupW(L"ÖÕ¶ËÃû", &_rgFieldStrings[SFI_LARGE_TEXT]);
     }
     if (SUCCEEDED(hr))
     {
-        hr = SHStrDupW(L"ÖÕ¶ËÃû", &_rgFieldStrings[SFI_SMALL_TEXT]);
+        hr = SHStrDupW(L"", &_rgFieldStrings[SFI_SMALL_TEXT]);
     }
     if (SUCCEEDED(hr))
     {

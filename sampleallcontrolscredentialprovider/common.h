@@ -48,8 +48,8 @@ struct FIELD_STATE_PAIR
 static const FIELD_STATE_PAIR s_rgFieldStatePairs[] = 
 {
     { CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },                   // SFI_TILEIMAGE
-    { CPFS_DISPLAY_IN_DESELECTED_TILE, CPFIS_NONE },                   // SFI_LARGE_TEXT
-    { CPFS_DISPLAY_IN_BOTH, CPFIS_NONE    },     // SFI_SMALL_TEXT   
+    { CPFS_DISPLAY_IN_BOTH, CPFIS_NONE },                   // SFI_LARGE_TEXT
+    { CPFS_DISPLAY_IN_DESELECTED_TILE, CPFIS_NONE    },     // SFI_SMALL_TEXT   
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE    },       // SFI_EDIT_TEXT   
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_FOCUSED },       // SFI_PASSWORD
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE    },       // SFI_SUBMIT_BUTTON   
@@ -77,9 +77,9 @@ static const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR s_rgCredProvFieldDescriptors[]
 
 static const PWSTR s_rgComboBoxStrings[] =
 {
-    L"First",
-    L"Second",
-    L"Third",
+    L"ÒÇÆ÷1",
+    L"ÒÇÆ÷2",
+    L"ÒÇÆ÷3",
 };
 
 static const PWSTR s_CPUS_Strings[] = 

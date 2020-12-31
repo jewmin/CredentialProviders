@@ -12,6 +12,7 @@
 // available UI controls.
 
 #include <credentialprovider.h>
+#include <propkey.h>
 #include "CSampleProvider.h"
 #include "CSampleCredential.h"
 #include "guid.h"
@@ -25,9 +26,12 @@ CSampleProvider::CSampleProvider():
     DllAddRef();
 
     _pCredential = NULL;
+	_pCredProviderUserArray = NULL;
 
 	Utils::SetLog(&file_log_);
-	Utils::Output(L"CSampleProvider::CSampleProvider");
+	SYSTEMTIME systime;
+	GetLocalTime(&systime);
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::CSampleProvider init: %d-%d-%d %d:%d:%d", systime.wYear, systime.wMonth, systime.wDay, systime.wHour, systime.wMinute, systime.wSecond));
 }
 
 CSampleProvider::~CSampleProvider()
@@ -37,6 +41,12 @@ CSampleProvider::~CSampleProvider()
         _pCredential->Release();
         _pCredential = NULL;
     }
+
+	if (_pCredProviderUserArray != NULL)
+	{
+		_pCredProviderUserArray->Release();
+		_pCredProviderUserArray = NULL;
+	}
 
 	Utils::Output(L"CSampleProvider::~CSampleProvider");
 	Utils::SetLog(NULL);
@@ -197,6 +207,7 @@ HRESULT CSampleProvider::GetCredentialCount(
     *pdwDefault = 0;
     *pbAutoLogonWithDefault = FALSE;
 	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialCount *pdwCount: %d, *pdwDefault: %d, *pbAutoLogonWithDefault: %s", *pdwCount, *pdwDefault, *pbAutoLogonWithDefault ? L"TRUE": L"FALSE"));
+	_EnumerateCredentials();
     return S_OK;
 }
 
@@ -219,6 +230,52 @@ HRESULT CSampleProvider::GetCredentialAt(
     }
 
     return hr;
+}
+
+HRESULT CSampleProvider::SetUserArray(
+	__in ICredentialProviderUserArray *users
+	)
+{
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetUserArray users: %p", users));
+	if (_pCredProviderUserArray) {
+		_pCredProviderUserArray->Release();
+	}
+	_pCredProviderUserArray = users;
+	_pCredProviderUserArray->AddRef();
+	return S_OK;
+}
+
+HRESULT CSampleProvider::_EnumerateCredentials()
+{
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials"));
+	HRESULT hr = E_UNEXPECTED;
+	if (_pCredProviderUserArray != NULL) {
+		DWORD userCount;
+		_pCredProviderUserArray->GetCount(&userCount);
+		if (userCount > 0) {
+			for (DWORD i = 0; i < userCount; i++) {
+				ICredentialProviderUser *pCredUser;
+				hr = _pCredProviderUserArray->GetAt(i, &pCredUser);
+				if (SUCCEEDED(hr)) {
+					GUID providerID;
+					PWSTR sid;
+					PWSTR pwszQualifiedUserName;
+					PWSTR pwszLogonStatusString;
+					PWSTR pwszUserName;
+					PWSTR pwszDisplayName;
+					pCredUser->GetProviderID(&providerID);
+					pCredUser->GetSid(&sid);
+					pCredUser->GetStringValue(PKEY_Identity_QualifiedUserName, &pwszQualifiedUserName);
+					pCredUser->GetStringValue(PKEY_Identity_LogonStatusString, &pwszLogonStatusString);
+					pCredUser->GetStringValue(PKEY_Identity_UserName, &pwszUserName);
+					pCredUser->GetStringValue(PKEY_Identity_DisplayName, &pwszDisplayName);
+					Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials sid: %s, pwszQualifiedUserName: %s, pwszLogonStatusString: %s, pwszUserName: %s, pwszDisplayName: %s", sid, pwszQualifiedUserName, pwszLogonStatusString, pwszUserName, pwszDisplayName));
+					pCredUser->Release();
+				}
+			}
+		}
+	}
+	return hr;
 }
 
 // Boilerplate code to create our provider.
