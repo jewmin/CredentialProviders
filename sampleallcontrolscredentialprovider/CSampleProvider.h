@@ -13,7 +13,6 @@
 
 #include "CSampleCredential.h"
 #include "helpers.h"
-#include "FileLog.h"
 
 class CSampleProvider : public ICredentialProvider, public ICredentialProviderSetUserArray
 {
@@ -76,6 +75,5 @@ private:
     LONG                                    _cRef;            // Used for reference counting.
     CSampleCredential                       *_pCredential;    // Our credential.
     CREDENTIAL_PROVIDER_USAGE_SCENARIO      _cpus;
-	Utils::CFileLog							file_log_;
 	ICredentialProviderUserArray			*_pCredProviderUserArray;
 };

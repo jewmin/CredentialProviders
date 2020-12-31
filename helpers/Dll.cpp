@@ -12,11 +12,16 @@
 #include <unknwn.h>
 #include "Dll.h"
 #include "helpers.h"
+#include "FileLog.h"
+#include "Utils.h"
 
 static LONG g_cRef = 0;   // global dll reference count
 HINSTANCE g_hinst = NULL; // global dll hinstance
 
+static Utils::CFileLog g_log;
+
 extern HRESULT CSample_CreateInstance(__in REFIID riid, __deref_out void** ppv);
+extern HRESULT CFilter_CreateInstance(__in REFIID riid, __deref_out void** ppv);
 EXTERN_C GUID CLSID_CSample;
 
 class CClassFactory : public IClassFactory
@@ -56,7 +61,16 @@ public:
         HRESULT hr;
         if (!pUnkOuter)
         {
-            hr = CSample_CreateInstance(riid, ppv);
+			if (IID_ICredentialProvider == riid) {
+				hr = CSample_CreateInstance(riid, ppv);
+			}
+			else if (IID_ICredentialProviderFilter == riid) {
+				hr = CFilter_CreateInstance(riid, ppv);
+			}
+			else {
+				*ppv = NULL;
+				hr = CLASS_E_NOAGGREGATION;
+			}
         }
         else
         {
@@ -124,11 +138,13 @@ void DllRelease()
 
 STDAPI DllCanUnloadNow()
 {
+	Utils::SetLog(NULL);
     return (g_cRef > 0) ? S_FALSE : S_OK;
 }
 
 STDAPI DllGetClassObject(__in REFCLSID rclsid, __in REFIID riid, __deref_out void** ppv)
 {
+	Utils::SetLog(&g_log);
     return CClassFactory_CreateInstance(rclsid, riid, ppv);
 }
 

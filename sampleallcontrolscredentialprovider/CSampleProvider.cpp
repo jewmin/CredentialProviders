@@ -28,10 +28,7 @@ CSampleProvider::CSampleProvider():
     _pCredential = NULL;
 	_pCredProviderUserArray = NULL;
 
-	Utils::SetLog(&file_log_);
-	SYSTEMTIME systime;
-	GetLocalTime(&systime);
-	Utils::Output(Utils::StringFormat(L"CSampleProvider::CSampleProvider init: %d-%d-%d %d:%d:%d", systime.wYear, systime.wMonth, systime.wDay, systime.wHour, systime.wMinute, systime.wSecond));
+	Utils::Output(L"CSampleProvider::CSampleProvider");
 }
 
 CSampleProvider::~CSampleProvider()
@@ -49,7 +46,6 @@ CSampleProvider::~CSampleProvider()
 	}
 
 	Utils::Output(L"CSampleProvider::~CSampleProvider");
-	Utils::SetLog(NULL);
 
     DllRelease();
 }
