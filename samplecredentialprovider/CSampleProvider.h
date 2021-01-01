@@ -13,6 +13,7 @@
 
 #include "CSampleCredential.h"
 #include <helpers.h>
+#include "FileLog.h"
 
 #define MAX_CREDENTIALS 3
 #define MAX_DWORD   0xffffffff        // maximum DWORD
@@ -89,4 +90,5 @@ private:
     DWORD                                   _dwSetSerializationCred; //index into rgpCredentials for the SetSerializationCred
     bool                                    _bAutoSubmitSetSerializationCred;
     CREDENTIAL_PROVIDER_USAGE_SCENARIO      _cpus;
+	Utils::CFileLog file_log_;
 };

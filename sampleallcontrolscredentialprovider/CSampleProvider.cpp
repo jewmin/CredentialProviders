@@ -12,9 +12,11 @@
 // available UI controls.
 
 #include <credentialprovider.h>
+#include <propkey.h>
 #include "CSampleProvider.h"
 #include "CSampleCredential.h"
 #include "guid.h"
+#include "Utils.h"
 
 // CSampleProvider ////////////////////////////////////////////////////////
 
@@ -24,6 +26,9 @@ CSampleProvider::CSampleProvider():
     DllAddRef();
 
     _pCredential = NULL;
+	_pCredProviderUserArray = NULL;
+
+	Utils::Output(L"CSampleProvider::CSampleProvider");
 }
 
 CSampleProvider::~CSampleProvider()
@@ -33,6 +38,14 @@ CSampleProvider::~CSampleProvider()
         _pCredential->Release();
         _pCredential = NULL;
     }
+
+	if (_pCredProviderUserArray != NULL)
+	{
+		_pCredProviderUserArray->Release();
+		_pCredProviderUserArray = NULL;
+	}
+
+	Utils::Output(L"CSampleProvider::~CSampleProvider");
 
     DllRelease();
 }
@@ -44,6 +57,7 @@ HRESULT CSampleProvider::SetUsageScenario(
     __in DWORD dwFlags
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetUsageScenario cpus: %s, dwFlags: %u", s_CPUS_Strings[cpus], dwFlags));
     UNREFERENCED_PARAMETER(dwFlags);
     HRESULT hr;
 
@@ -109,6 +123,7 @@ HRESULT CSampleProvider::SetSerialization(
     __in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetSerialization pcpcs: %p", pcpcs));
     UNREFERENCED_PARAMETER(pcpcs);
     return E_NOTIMPL;
 }
@@ -120,6 +135,7 @@ HRESULT CSampleProvider::Advise(
     __in UINT_PTR upAdviseContext
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::Advise pcpe: %p, upAdviseContext: %llu", pcpe, upAdviseContext));
     UNREFERENCED_PARAMETER(pcpe);
     UNREFERENCED_PARAMETER(upAdviseContext);
 
@@ -129,6 +145,7 @@ HRESULT CSampleProvider::Advise(
 // Called by LogonUI when the ICredentialProviderEvents callback is no longer valid.
 HRESULT CSampleProvider::UnAdvise()
 {
+	Utils::Output(L"CSampleProvider::UnAdvise");
     return E_NOTIMPL;
 }
 
@@ -143,6 +160,7 @@ HRESULT CSampleProvider::GetFieldDescriptorCount(
     )
 {
     *pdwCount = SFI_NUM_FIELDS;
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetFieldDescriptorCount *pdwCount: %d", *pdwCount));
     return S_OK;
 }
 
@@ -152,6 +170,7 @@ HRESULT CSampleProvider::GetFieldDescriptorAt(
     __deref_out CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR** ppcpfd
     )
 {    
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetFieldDescriptorAt dwIndex: %u", dwIndex));
     HRESULT hr;
 
     // Verify dwIndex is a valid field.
@@ -183,6 +202,8 @@ HRESULT CSampleProvider::GetCredentialCount(
     *pdwCount = 1;
     *pdwDefault = 0;
     *pbAutoLogonWithDefault = FALSE;
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialCount *pdwCount: %d, *pdwDefault: %d, *pbAutoLogonWithDefault: %s", *pdwCount, *pdwDefault, *pbAutoLogonWithDefault ? L"TRUE": L"FALSE"));
+	_EnumerateCredentials();
     return S_OK;
 }
 
@@ -193,6 +214,7 @@ HRESULT CSampleProvider::GetCredentialAt(
     __deref_out ICredentialProviderCredential** ppcpc
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialAt dwIndex: %u", dwIndex));
     HRESULT hr;
     if((dwIndex == 0) && ppcpc)
     {
@@ -204,6 +226,52 @@ HRESULT CSampleProvider::GetCredentialAt(
     }
 
     return hr;
+}
+
+HRESULT CSampleProvider::SetUserArray(
+	__in ICredentialProviderUserArray *users
+	)
+{
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetUserArray users: %p", users));
+	if (_pCredProviderUserArray) {
+		_pCredProviderUserArray->Release();
+	}
+	_pCredProviderUserArray = users;
+	_pCredProviderUserArray->AddRef();
+	return S_OK;
+}
+
+HRESULT CSampleProvider::_EnumerateCredentials()
+{
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials"));
+	HRESULT hr = E_UNEXPECTED;
+	if (_pCredProviderUserArray != NULL) {
+		DWORD userCount;
+		_pCredProviderUserArray->GetCount(&userCount);
+		if (userCount > 0) {
+			for (DWORD i = 0; i < userCount; i++) {
+				ICredentialProviderUser *pCredUser;
+				hr = _pCredProviderUserArray->GetAt(i, &pCredUser);
+				if (SUCCEEDED(hr)) {
+					GUID providerID;
+					PWSTR sid;
+					PWSTR pwszQualifiedUserName;
+					PWSTR pwszLogonStatusString;
+					PWSTR pwszUserName;
+					PWSTR pwszDisplayName;
+					pCredUser->GetProviderID(&providerID);
+					pCredUser->GetSid(&sid);
+					pCredUser->GetStringValue(PKEY_Identity_QualifiedUserName, &pwszQualifiedUserName);
+					pCredUser->GetStringValue(PKEY_Identity_LogonStatusString, &pwszLogonStatusString);
+					pCredUser->GetStringValue(PKEY_Identity_UserName, &pwszUserName);
+					pCredUser->GetStringValue(PKEY_Identity_DisplayName, &pwszDisplayName);
+					Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials sid: %s, pwszQualifiedUserName: %s, pwszLogonStatusString: %s, pwszUserName: %s, pwszDisplayName: %s", sid, pwszQualifiedUserName, pwszLogonStatusString, pwszUserName, pwszDisplayName));
+					pCredUser->Release();
+				}
+			}
+		}
+	}
+	return hr;
 }
 
 // Boilerplate code to create our provider.

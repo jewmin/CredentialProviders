@@ -77,7 +77,33 @@ static const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR s_rgCredProvFieldDescriptors[]
 
 static const PWSTR s_rgComboBoxStrings[] =
 {
-    L"First",
-    L"Second",
-    L"Third",
+    L"ÒÇÆ÷1",
+    L"ÒÇÆ÷2",
+    L"ÒÇÆ÷3",
+};
+
+static const PWSTR s_CPUS_Strings[] = 
+{
+	L"CPUS_INVALID",
+	L"CPUS_LOGON",
+	L"CPUS_UNLOCK_WORKSTATION",
+	L"CPUS_CHANGE_PASSWORD",
+	L"CPUS_CREDUI",
+	L"CPUS_PLAP",
+};
+
+static const PWSTR s_CPFS_Strings[] =
+{
+	L"CPFS_HIDDEN",
+	L"CPFS_DISPLAY_IN_SELECTED_TILE",
+	L"CPFS_DISPLAY_IN_DESELECTED_TILE",
+	L"CPFS_DISPLAY_IN_BOTH",
+};
+
+static const PWSTR s_CPFIS_Strings[] =
+{
+	L"CPFIS_NONE",
+	L"CPFIS_READONLY",
+	L"CPFIS_DISABLED",
+	L"CPFIS_FOCUSED",
 };

@@ -16,6 +16,36 @@ void Output(const std::wstring & message) {
 	}
 }
 
+std::wstring StringFormat(const wchar_t * format, ...) {
+	va_list args;
+	va_start(args, format);
+	std::wstring s = StringFormatVa(format, args);
+	va_end(args);
+	return s;
+}
+
+std::wstring StringFormatVa(const wchar_t * format, va_list args) {
+	size_t size = 1024;
+	wchar_t * buffer = new wchar_t[size];
+
+	while (true) {
+		va_list args_copy;
+		args_copy = args;
+		int n = _vsnwprintf(buffer, size, format, args_copy);
+		va_end(args_copy);
+
+		if (n > -1 && (size_t)n < size) {
+			std::wstring s(buffer);
+			delete[] buffer;
+			return s;
+		}
+
+		size = n > -1 ? n + 1 : size << 1;
+		delete[] buffer;
+		buffer = new wchar_t[size];
+	}
+}
+
 std::string WToA(const std::wstring & input) {
 	return WToA(input.c_str(), input.length());
 }

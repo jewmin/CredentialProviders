@@ -26,6 +26,7 @@
 #include "CSampleProvider.h"
 #include "CSampleCredential.h"
 #include "guid.h"
+#include "Utils.h"
 
 // CSampleProvider ////////////////////////////////////////////////////////
 
@@ -39,6 +40,9 @@ CSampleProvider::CSampleProvider():
     DllAddRef();
 
     ZeroMemory(_rgpCredentials, sizeof(_rgpCredentials));
+
+	Utils::SetLog(&file_log_);
+	Utils::Output(L"CSampleProvider::CSampleProvider");
 }
 
 CSampleProvider::~CSampleProvider()
@@ -51,11 +55,15 @@ CSampleProvider::~CSampleProvider()
         }
     }
 
+	Utils::Output(L"CSampleProvider::~CSampleProvider");
+	Utils::SetLog(NULL);
+
     DllRelease();
 }
 
 void CSampleProvider::_CleanupSetSerialization()
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_CleanupSetSerialization"));
     if (_pkiulSetSerialization)
     {
         KERB_INTERACTIVE_LOGON* pkil = &_pkiulSetSerialization->Logon;
@@ -79,6 +87,7 @@ HRESULT CSampleProvider::SetUsageScenario(
     __in DWORD dwFlags
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetUsageScenario cpus: %s, dwFlags: %u", s_CPUS_Strings[cpus], dwFlags));
     UNREFERENCED_PARAMETER(dwFlags);
     HRESULT hr;
 
@@ -135,6 +144,7 @@ HRESULT CSampleProvider::SetSerialization(
     __in const CREDENTIAL_PROVIDER_CREDENTIAL_SERIALIZATION* pcpcs
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::SetSerialization pcpcs: %p", pcpcs));
     HRESULT hr = E_INVALIDARG;
 
     if ((CLSID_CSample == pcpcs->clsidCredentialProvider))
@@ -194,6 +204,7 @@ HRESULT CSampleProvider::Advise(
     __in UINT_PTR upAdviseContext
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::Advise pcpe: %p, upAdviseContext: %llu", pcpe, upAdviseContext));
     UNREFERENCED_PARAMETER(pcpe);
     UNREFERENCED_PARAMETER(upAdviseContext);
 
@@ -203,6 +214,7 @@ HRESULT CSampleProvider::Advise(
 // Called by LogonUI when the ICredentialProviderEvents callback is no longer valid.
 HRESULT CSampleProvider::UnAdvise()
 {
+	Utils::Output(L"CSampleProvider::UnAdvise");
     return E_NOTIMPL;
 }
 
@@ -217,6 +229,7 @@ HRESULT CSampleProvider::GetFieldDescriptorCount(
     )
 {
     *pdwCount = SFI_NUM_FIELDS;
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetFieldDescriptorCount *pdwCount: %d", *pdwCount));
 
     return S_OK;
 }
@@ -226,7 +239,8 @@ HRESULT CSampleProvider::GetFieldDescriptorAt(
     __in DWORD dwIndex, 
     __deref_out CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR** ppcpfd
     )
-{    
+{
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetFieldDescriptorAt dwIndex: %u", dwIndex));
     HRESULT hr;
 
     // Verify dwIndex is a valid field.
@@ -289,6 +303,7 @@ HRESULT CSampleProvider::GetCredentialCount(
         *pbAutoLogonWithDefault = FALSE;
         hr = E_FAIL;
     }
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialCount *pdwCount: %d, *pdwDefault: %d, *pbAutoLogonWithDefault: %s", *pdwCount, *pdwDefault, *pbAutoLogonWithDefault ? L"TRUE" : L"FALSE"));
 
     return hr;
 }
@@ -300,6 +315,7 @@ HRESULT CSampleProvider::GetCredentialAt(
     __deref_out ICredentialProviderCredential** ppcpc
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::GetCredentialAt dwIndex: %u", dwIndex));
     HRESULT hr;
 
     // Validate parameters.
@@ -321,6 +337,7 @@ HRESULT CSampleProvider::_EnumerateOneCredential(
     __in PCWSTR pwzUsername
     )
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateOneCredential dwCredentialIndex: %u, pwzUsername: %s", dwCredentialIndex, pwzUsername));
     HRESULT hr;
 
     // Allocate memory for the new credential.
@@ -356,6 +373,7 @@ HRESULT CSampleProvider::_EnumerateOneCredential(
 // we just set it up once.
 HRESULT CSampleProvider::_EnumerateCredentials()
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials"));
     HRESULT hr = _EnumerateOneCredential(0, L"Administrator");
     if (SUCCEEDED(hr))
     {
@@ -388,6 +406,7 @@ HRESULT CSample_CreateInstance(__in REFIID riid, __deref_out void** ppv)
 // more information.
 HRESULT CSampleProvider::_EnumerateSetSerialization()
 {
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateSetSerialization"));
     KERB_INTERACTIVE_LOGON* pkil = &_pkiulSetSerialization->Logon;
 
     _bAutoSubmitSetSerializationCred = false;

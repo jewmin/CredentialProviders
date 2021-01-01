@@ -14,7 +14,7 @@
 #include "CSampleCredential.h"
 #include "helpers.h"
 
-class CSampleProvider : public ICredentialProvider
+class CSampleProvider : public ICredentialProvider, public ICredentialProviderSetUserArray
 {
   public:
     // IUnknown
@@ -38,6 +38,7 @@ class CSampleProvider : public ICredentialProvider
         static const QITAB qit[] =
         {
             QITABENT(CSampleProvider, ICredentialProvider), // IID_ICredentialProvider
+			QITABENT(CSampleProvider, ICredentialProviderSetUserArray), // IID_ICredentialProviderSetUserArray
             {0},
         };
         return QISearch(this, qit, riid, ppv);
@@ -59,6 +60,8 @@ class CSampleProvider : public ICredentialProvider
     IFACEMETHODIMP GetCredentialAt(__in DWORD dwIndex, 
                                    __deref_out ICredentialProviderCredential** ppcpc);
 
+	IFACEMETHODIMP SetUserArray(__in ICredentialProviderUserArray *users);
+
     friend HRESULT CSample_CreateInstance(__in REFIID riid, __deref_out void** ppv);
 
   protected:
@@ -66,9 +69,11 @@ class CSampleProvider : public ICredentialProvider
     __override ~CSampleProvider();
     
   private:
+	HRESULT _EnumerateCredentials();
     
 private:
     LONG                                    _cRef;            // Used for reference counting.
     CSampleCredential                       *_pCredential;    // Our credential.
     CREDENTIAL_PROVIDER_USAGE_SCENARIO      _cpus;
+	ICredentialProviderUserArray			*_pCredProviderUserArray;
 };
