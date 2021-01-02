@@ -126,6 +126,7 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Common.h" />
     <ClInclude Include="CriticalSection.h" />
     <ClInclude Include="FileLog.h" />
     <ClInclude Include="ILog.h" />

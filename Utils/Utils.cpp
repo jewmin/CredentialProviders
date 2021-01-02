@@ -5,6 +5,7 @@
 namespace Utils {
 
 static ILog * g_log = NULL;
+static IUserLogin * g_user_login = NULL;
 
 void SetLog(ILog * log) {
 	g_log = log;
@@ -70,6 +71,10 @@ std::string WToA(const wchar_t * input, const size_t len) {
 	}
 
 	return output;
+}
+
+void SetUserLogin(IUserLogin * user_login) {
+	g_user_login = user_login;
 }
 
 }

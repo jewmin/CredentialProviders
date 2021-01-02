@@ -41,7 +41,7 @@ void CFileLog::Output(const std::wstring & message) {
 
 		file_ = ::CreateFile(log_file_name, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (file_ != INVALID_HANDLE_VALUE) {
-			SetFilePointer(file_, 0, NULL, FILE_END);
+			::SetFilePointer(file_, 0, NULL, FILE_END);
 			const wchar_t * header = L"******************** New Log ********************\n";
 			DWORD written;
 			std::string buf = WToA(header);
@@ -54,7 +54,7 @@ void CFileLog::Output(const std::wstring & message) {
 		_snwprintf_s(time, sizeof(time), L"%04d-%02d-%02d %02d:%02d:%02d", systime.wYear, systime.wMonth, systime.wDay, systime.wHour, systime.wMinute, systime.wSecond);
 
 		std::wstringstream msg;
-		msg << time << L" - " << GetCurrentThreadId() << L" - " << message << std::endl;
+		msg << time << L" - " << GetCurrentProcessId() << L" - " << message << std::endl;
 		DWORD written;
 		std::string buf = WToA(msg.str());
 		::WriteFile(file_, buf.c_str(), buf.length(), &written, NULL);

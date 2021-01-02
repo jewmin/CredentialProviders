@@ -4,9 +4,12 @@
 #include "pch.h"
 #include <iostream>
 #include <Windows.h>
+#include <credentialprovider.h>
 #include <wincred.h>
 #include "Utils.h"
 #include "FileLog.h"
+
+#define enum2string(val) L#val
 
 int main()
 {
@@ -31,6 +34,9 @@ int main()
 	Utils::Output(L"sksksjdf≤‚ ‘ø›“∂sdfk∂·");
 	Utils::WToA(NULL);
 	Utils::StringFormat(L"≤‚ ‘abc %s %d", L"«∆«∆", 1000);
+	Utils::Output(enum2string(CPUS_LOGON));
+	CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus = CPUS_UNLOCK_WORKSTATION;
+	Utils::Output(enum2string(CREDENTIAL_PROVIDER_USAGE_SCENARIO(cpus)));
 	return 0;
 }
 
