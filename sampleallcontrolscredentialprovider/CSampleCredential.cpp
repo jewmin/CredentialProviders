@@ -21,7 +21,8 @@
 
 CSampleCredential::CSampleCredential():
     _cRef(1),
-    _pCredProvCredentialEvents(NULL)
+    _pCredProvCredentialEvents(NULL),
+	_bConnectCanceled(false)
 {
 	Utils::Output(L"CSampleCredential::CSampleCredential");
     DllAddRef();
@@ -83,7 +84,7 @@ HRESULT CSampleCredential::Initialize(
     }
     if (SUCCEEDED(hr))
     {
-        hr = SHStrDupW(L"Administrator", &_rgFieldStrings[SFI_EDIT_TEXT]);
+        hr = SHStrDupW(L"admin", &_rgFieldStrings[SFI_EDIT_TEXT]);
     }
     if (SUCCEEDED(hr))
     {
@@ -491,6 +492,14 @@ HRESULT CSampleCredential::GetSerialization(
     UNREFERENCED_PARAMETER(ppwszOptionalStatusText);
     UNREFERENCED_PARAMETER(pcpsiOptionalStatusIcon);
 
+	if (_bConnectCanceled) {
+		*pcpgsr = CPGSR_NO_CREDENTIAL_NOT_FINISHED;
+		if (_pCredProvCredentialEvents) {
+			_pCredProvCredentialEvents->SetFieldString(this, SFI_PASSWORD, L"");
+		}
+		return E_UNEXPECTED;
+	}
+
     HRESULT hr;
 
     WCHAR wsz[MAX_COMPUTERNAME_LENGTH+1];
@@ -610,14 +619,27 @@ HRESULT CSampleCredential::ReportResult(
 HRESULT CSampleCredential::Connect(_In_ IQueryContinueWithStatus* pqcws)
 {
 	Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect pqcws: %p", pqcws));
+	_bConnectCanceled = false;
 	if (pqcws != nullptr) {
 		pqcws->SetStatusMessage(L"Á¬½ÓÖÐ...");
+		HRESULT hr;
+		int count = 10;
+		while (count-- > 0) {
+			Sleep(500);
+			hr = pqcws->QueryContinue();
+			Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect hr: %d", hr));
+			if (!SUCCEEDED(hr)) {
+				Utils::Output(L"CSampleCredential::Connect Cancel");
+				_bConnectCanceled = true;
+				return E_FAIL;
+			}
+		}
 	}
 	return S_OK;
 }
 
 HRESULT CSampleCredential::Disconnect()
 {
-	Utils::Output(Utils::StringFormat(L"CSampleCredential::Disconnect"));
+	Utils::Output(L"CSampleCredential::Disconnect");
 	return E_NOTIMPL;
 }

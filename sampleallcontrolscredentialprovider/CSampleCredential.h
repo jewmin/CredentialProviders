@@ -122,5 +122,5 @@ public:
 
     DWORD                                   _dwComboIndex;                                  // Tracks the current index 
                                                                                             // of our combobox.
-
+    bool                                    _bConnectCanceled;                              // 取消连接
 };

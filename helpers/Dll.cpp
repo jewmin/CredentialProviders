@@ -129,22 +129,31 @@ HRESULT CClassFactory_CreateInstance(__in REFCLSID rclsid, __in REFIID riid, __d
 void DllAddRef()
 {
     InterlockedIncrement(&g_cRef);
+    Utils::Output(Utils::StringFormat(L"DllAddRef g_cRef: %d", g_cRef));
 }
 
 void DllRelease()
 {
     InterlockedDecrement(&g_cRef);
+    Utils::Output(Utils::StringFormat(L"DllRelease g_cRef: %d", g_cRef));
 }
 
 STDAPI DllCanUnloadNow()
 {
-	Utils::SetLog(NULL);
-    return (g_cRef > 0) ? S_FALSE : S_OK;
+    HRESULT hr = (g_cRef > 0) ? S_FALSE : S_OK;
+    if (SUCCEEDED(hr)) {
+        Utils::Output(L"DllCanUnloadNow - S_OK");
+        Utils::SetLog(NULL);
+    } else {
+        Utils::Output(L"DllCanUnloadNow - S_FALSE");
+    }
+    return hr;
 }
 
 STDAPI DllGetClassObject(__in REFCLSID rclsid, __in REFIID riid, __deref_out void** ppv)
 {
-	Utils::SetLog(&g_log);
+    Utils::SetLog(&g_log);
+    Utils::Output(L"DllGetClassObject");
     return CClassFactory_CreateInstance(rclsid, riid, ppv);
 }
 

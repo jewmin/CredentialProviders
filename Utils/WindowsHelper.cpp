@@ -3,10 +3,10 @@
 namespace Utils {
 
 std::wstring GetMachineName() {
-	wchar_t computer[MAX_COMPUTERNAME_LENGTH + 1];
-	DWORD computer_len = ARRAYSIZE(computer);
-	if (GetComputerName(computer, &computer_len)) {
-		return computer;
+	WCHAR wsz[MAX_COMPUTERNAME_LENGTH + 1];
+	DWORD cch = ARRAYSIZE(wsz);
+	if (GetComputerName(wsz, &cch)) {
+		return wsz;
 	} else {
 		return L".";
 	}
