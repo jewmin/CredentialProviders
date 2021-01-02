@@ -8,6 +8,7 @@
 #include <wincred.h>
 #include "Utils.h"
 #include "FileLog.h"
+#include "WindowsHelper.h"
 
 #define enum2string(val) L#val
 
@@ -37,6 +38,15 @@ int main()
 	// Utils::Output(enum2string(CPUS_LOGON));
 	// CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus = CPUS_UNLOCK_WORKSTATION;
 	// Utils::Output(enum2string(CREDENTIAL_PROVIDER_USAGE_SCENARIO(cpus)));
+	PWTS_SESSION_INFOW infos;
+	DWORD count;
+	if (::WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &infos, &count)) {
+		for (DWORD i = 0; i < count; i++) {
+			Utils::Output(Utils::StringFormat(L"%s, %d, %d", infos[i].pWinStationName, infos[i].SessionId, infos[i].State));
+			Utils::Output(Utils::StringFormat(L"domain: %s, user: %s", Utils::GetSessionDomainName(infos[i].SessionId).c_str(), Utils::GetSessionUserName(infos[i].SessionId).c_str()));
+		}
+		::WTSFreeMemory(infos);
+	}
 	return 0;
 }
 
