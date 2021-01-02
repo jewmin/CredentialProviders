@@ -34,9 +34,9 @@ int main()
 	Utils::Output(L"sksksjdf≤‚ ‘ø›“∂sdfk∂·");
 	Utils::WToA(NULL);
 	Utils::StringFormat(L"≤‚ ‘abc %s %d", L"«∆«∆", 1000);
-	Utils::Output(enum2string(CPUS_LOGON));
-	CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus = CPUS_UNLOCK_WORKSTATION;
-	Utils::Output(enum2string(CREDENTIAL_PROVIDER_USAGE_SCENARIO(cpus)));
+	// Utils::Output(enum2string(CPUS_LOGON));
+	// CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus = CPUS_UNLOCK_WORKSTATION;
+	// Utils::Output(enum2string(CREDENTIAL_PROVIDER_USAGE_SCENARIO(cpus)));
 	return 0;
 }
 

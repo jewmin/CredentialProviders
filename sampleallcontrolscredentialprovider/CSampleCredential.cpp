@@ -606,3 +606,18 @@ HRESULT CSampleCredential::ReportResult(
     // this function can't fail.
     return S_OK;
 }
+
+HRESULT CSampleCredential::Connect(_In_ IQueryContinueWithStatus* pqcws)
+{
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect pqcws: %p", pqcws));
+	if (pqcws != nullptr) {
+		pqcws->SetStatusMessage(L"¡¨Ω”÷–...");
+	}
+	return S_OK;
+}
+
+HRESULT CSampleCredential::Disconnect()
+{
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::Disconnect"));
+	return E_NOTIMPL;
+}

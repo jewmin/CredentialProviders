@@ -124,13 +124,16 @@
     <ClCompile Include="CriticalSection.cpp" />
     <ClCompile Include="FileLog.cpp" />
     <ClCompile Include="Utils.cpp" />
+    <ClCompile Include="WindowsHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common.h" />
     <ClInclude Include="CriticalSection.h" />
     <ClInclude Include="FileLog.h" />
+    <ClInclude Include="Header.h" />
     <ClInclude Include="ILog.h" />
+    <ClInclude Include="IUserLogin.h" />
     <ClInclude Include="Utils.h" />
+    <ClInclude Include="WindowsHelper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

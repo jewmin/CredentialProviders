@@ -22,7 +22,7 @@
 #include "dll.h"
 #include "resource.h"
 
-class CSampleCredential : public ICredentialProviderCredential
+class CSampleCredential : public IConnectableCredentialProviderCredential
 {
 public:
     // IUnknown
@@ -46,6 +46,7 @@ public:
         static const QITAB qit[] =
         {
             QITABENT(CSampleCredential, ICredentialProviderCredential), // IID_ICredentialProviderCredential
+            QITABENT(CSampleCredential, IConnectableCredentialProviderCredential), // IID_IConnectableCredentialProviderCredential
             {0},
         };
         return QISearch(this, qit, riid, ppv);
@@ -82,6 +83,10 @@ public:
                                 __in NTSTATUS ntsSubstatus,
                                 __deref_out_opt PWSTR* ppwszOptionalStatusText, 
                                 __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon);
+
+    // IConnectableCredentialProviderCredential
+    IFACEMETHODIMP Connect(_In_ IQueryContinueWithStatus* pqcws);
+    IFACEMETHODIMP Disconnect();
 
   public:
     HRESULT Initialize(__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,

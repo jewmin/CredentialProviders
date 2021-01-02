@@ -24,6 +24,9 @@
     <ClCompile Include="CriticalSection.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="WindowsHelper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileLog.h">
@@ -38,7 +41,13 @@
     <ClInclude Include="ILog.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Common.h">
+    <ClInclude Include="Header.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="IUserLogin.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

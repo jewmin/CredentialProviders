@@ -17,6 +17,7 @@
 #include "CSampleCredential.h"
 #include "guid.h"
 #include "Utils.h"
+#include "WindowsHelper.h"
 
 // CSampleProvider ////////////////////////////////////////////////////////
 
@@ -243,7 +244,8 @@ HRESULT CSampleProvider::SetUserArray(
 
 HRESULT CSampleProvider::_EnumerateCredentials()
 {
-	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials"));
+	DWORD sessionid = Utils::GetCurrentSessionId();
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials - SessionId: %u, DomainName: %s, UserName: %s, MachineName: %s", sessionid, Utils::GetSessionDomainName(sessionid).c_str(), Utils::GetSessionUserName(sessionid).c_str(), Utils::GetMachineName().c_str()));
 	HRESULT hr = E_UNEXPECTED;
 	if (_pCredProviderUserArray != NULL) {
 		DWORD userCount;
