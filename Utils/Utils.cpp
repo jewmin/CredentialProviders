@@ -35,7 +35,7 @@ std::wstring StringFormatVa(const wchar_t * format, va_list args) {
 		int n = _vsnwprintf(buffer, size, format, args_copy);
 		va_end(args_copy);
 
-		if (n > -1 && (size_t)n < size) {
+		if (n > -1 && static_cast<size_t>(n) < size) {
 			std::wstring s(buffer);
 			delete[] buffer;
 			return s;

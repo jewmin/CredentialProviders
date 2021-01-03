@@ -245,7 +245,7 @@ HRESULT CSampleProvider::SetUserArray(
 HRESULT CSampleProvider::_EnumerateCredentials()
 {
 	DWORD sessionid = Utils::GetCurrentSessionId();
-	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials - SessionId: %u, DomainName: %s, UserName: %s, MachineName: %s", sessionid, Utils::GetSessionDomainName(sessionid).c_str(), Utils::GetSessionUserName(sessionid).c_str(), Utils::GetMachineName().c_str()));
+	Utils::Output(Utils::StringFormat(L"CSampleProvider::_EnumerateCredentials SessionId: %u, DomainName: %s, UserName: %s, MachineName: %s", sessionid, Utils::GetSessionDomainName(sessionid).c_str(), Utils::GetSessionUserName(sessionid).c_str(), Utils::GetMachineName().c_str()));
 	HRESULT hr = E_UNEXPECTED;
 	if (_pCredProviderUserArray != NULL) {
 		DWORD userCount;

@@ -123,6 +123,7 @@
   <ItemGroup>
     <ClCompile Include="CriticalSection.cpp" />
     <ClCompile Include="FileLog.cpp" />
+    <ClCompile Include="ServiceBase.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="WindowsHelper.cpp" />
   </ItemGroup>
@@ -132,6 +133,7 @@
     <ClInclude Include="Header.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IUserLogin.h" />
+    <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="WindowsHelper.h" />
   </ItemGroup>

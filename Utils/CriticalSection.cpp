@@ -18,7 +18,8 @@ void CCriticalSection::Leave() {
 	::LeaveCriticalSection(&cs_);
 }
 
-CCriticalSection::Owner::Owner(CCriticalSection & cs) : cs_(cs) {
+CCriticalSection::Owner::Owner(CCriticalSection & cs)
+	: cs_(cs) {
 	cs_.Enter();
 }
 

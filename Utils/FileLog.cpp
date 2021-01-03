@@ -3,8 +3,12 @@
 
 namespace Utils {
 
-CFileLog::CFileLog() : file_name_format_(L"CredentialProvider_%02d%02d%02d.log")
-	, timestamp_year_(0), timestamp_month_(0), timestamp_day_(0), file_(INVALID_HANDLE_VALUE) {
+CFileLog::CFileLog()
+	: file_name_format_(L"CredentialProvider_%02d%02d%02d.log")
+	, timestamp_year_(0)
+	, timestamp_month_(0)
+	, timestamp_day_(0)
+	, file_(INVALID_HANDLE_VALUE) {
 }
 
 CFileLog::~CFileLog() {
