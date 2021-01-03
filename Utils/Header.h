@@ -6,3 +6,4 @@
 #include <WtsApi32.h>
 #include <LM.h>
 #include <winnt.h>
+#include <assert.h>

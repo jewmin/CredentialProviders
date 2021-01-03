@@ -10,9 +10,11 @@ public:
 	CServiceBase(const std::wstring & service_name);
 	virtual ~CServiceBase();
 	static bool Run(CServiceBase * service);
-	static void WINAPI ServiceMain(DWORD argc, LPWSTR * argv);
+	static VOID WINAPI ServiceMain(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors);
+	static DWORD WINAPI ServiceCtrlHandler(DWORD dwControl, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext);
 
 protected:
+	bool Run(DWORD argc, LPWSTR * argv);
 	virtual bool OnContinue();
 	virtual bool OnPause();
 	virtual bool OnPowerEvent(PPOWERBROADCAST_SETTING setting);
@@ -37,6 +39,7 @@ private:
 	SERVICE_STATUS service_status_;
 	SERVICE_STATUS_HANDLE service_status_handle_;
 	CFileLog log_;
+	static CServiceBase * ServiceInstance;
 };
 
 }
