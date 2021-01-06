@@ -1,15 +1,15 @@
 Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Providers\{FF032558-38DA-4472-B969-31A636B7E5C7}]
-@="SampleAllControlsCredentialProvider"
+@="CredentialProvider"
 
 [HKEY_CLASSES_ROOT\CLSID\{FF032558-38DA-4472-B969-31A636B7E5C7}]
-@="SampleAllControlsCredentialProvider"
+@="CredentialProvider"
 
 [HKEY_CLASSES_ROOT\CLSID\{FF032558-38DA-4472-B969-31A636B7E5C7}\InprocServer32]
-@="SampleAllControlsCredentialProvider.dll"
+@="CredentialProvider.dll"
 "ThreadingModel"="Apartment"
 
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Authentication\Credential Provider Filters\{FF032558-38DA-4472-B969-31A636B7E5C7}]
-@="SampleAllControlsCredentialProvider"
+@="CredentialProvider"
 
