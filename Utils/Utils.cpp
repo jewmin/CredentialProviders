@@ -47,6 +47,18 @@ std::wstring StringFormatVa(const wchar_t * format, va_list args) {
 	}
 }
 
+std::wstring GetLastErrorString() {
+	DWORD error_code = ::GetLastError();
+	LPVOID lpBuffer = NULL;
+	if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpBuffer, 0, NULL)) {
+		std::wstring result = StringFormat(L"%u %s", error_code, lpBuffer);
+		LocalFree(lpBuffer);
+		return result;
+	}
+
+	return StringFormat(L"%u", error_code);
+}
+
 std::string WToA(const std::wstring & input) {
 	return WToA(input.c_str(), input.length());
 }
@@ -63,10 +75,10 @@ std::string WToA(const wchar_t * input, const size_t len) {
 	std::string output;
 
 	if (len != 0) {
-		int output_len = ::WideCharToMultiByte(CP_GBK, 0, input, len, NULL, 0, 0, 0);
+		int output_len = ::WideCharToMultiByte(CP_GBK, 0, input, static_cast<int>(len), NULL, 0, 0, 0);
 		if (output_len > 0) {
 			output.resize(output_len);
-			::WideCharToMultiByte(CP_GBK, 0, input, len, const_cast<char *>(output.c_str()), output.length(), 0, 0);
+			::WideCharToMultiByte(CP_GBK, 0, input, static_cast<int>(len), const_cast<char *>(output.c_str()), static_cast<int>(output.length()), 0, 0);
 		}
 	}
 

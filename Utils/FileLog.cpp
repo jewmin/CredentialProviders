@@ -49,7 +49,7 @@ void CFileLog::Output(const std::wstring & message) {
 			const wchar_t * header = L"******************** New Log ********************\n";
 			DWORD written;
 			std::string buf = WToA(header);
-			::WriteFile(file_, buf.c_str(), buf.length(), &written, NULL);
+			::WriteFile(file_, buf.c_str(), static_cast<DWORD>(buf.length()), &written, NULL);
 		}
 	}
 
@@ -61,7 +61,7 @@ void CFileLog::Output(const std::wstring & message) {
 		msg << time << L" - " << GetCurrentProcessId() << L" - " << message << std::endl;
 		DWORD written;
 		std::string buf = WToA(msg.str());
-		::WriteFile(file_, buf.c_str(), buf.length(), &written, NULL);
+		::WriteFile(file_, buf.c_str(), static_cast<DWORD>(buf.length()), &written, NULL);
 	}
 }
 

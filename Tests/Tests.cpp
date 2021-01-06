@@ -17,7 +17,7 @@ class DemoService : public Utils::CServiceBase {
 public:
 	DemoService() : CServiceBase(L"DemoService"), shutdown_(false) {
 		can_shutdown_ = true;
-		can_pause_and_continue_ = true;
+		// can_pause_and_continue_ = true;
 		can_handle_power_event_ = true;
 		can_handle_session_change_event_ = true;
 	}
@@ -30,13 +30,14 @@ public:
 		}
 	}
 	virtual void OnStop() {
+		CServiceBase::OnStop();
 		shutdown_ = true;
 	}
 private:
 	bool shutdown_;
 };
 
-int main(int argc, wchar_t ** argv)
+int wmain(int argc, const wchar_t ** argv)
 {
 	// BOOL save = false;
 	// DWORD authPackage = 0;
@@ -70,6 +71,28 @@ int main(int argc, wchar_t ** argv)
 			Utils::Output(Utils::StringFormat(L"domain: %s, user: %s", Utils::GetSessionDomainName(infos[i].SessionId).c_str(), Utils::GetSessionUserName(infos[i].SessionId).c_str()));
 		}
 		::WTSFreeMemory(infos);
+	}
+
+	if (argc == 2) {
+		std::wstring opt(argv[1]);
+		if (opt == L"--install") {
+			if (!Utils::CServiceBase::InstallService(L"DemoService", L"Demo Service", L"这是一个测试服务程序", argv[0], SERVICE_AUTO_START)) {
+				Utils::Output(L"install error");
+			}
+			else {
+				Utils::Output(L"install success");
+			}
+			return 0;
+		}
+		else if (opt == L"--uninstall") {
+			if (!Utils::CServiceBase::UnInstallService(L"DemoService")) {
+				Utils::Output(L"uninstall error");
+			}
+			else {
+				Utils::Output(L"uninstall success");
+			}
+			return 0;
+		}
 	}
 
 	Utils::CServiceBase::Run(new DemoService());

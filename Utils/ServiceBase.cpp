@@ -1,11 +1,93 @@
 #include "ServiceBase.h"
 #include "Utils.h"
+#include "FileLog.h"
 
 namespace Utils {
 
 CServiceBase * CServiceBase::ServiceInstance = NULL;
 
+
+bool CServiceBase::InstallService(const std::wstring & service_name, const std::wstring & service_display_name, const std::wstring & service_description, const std::wstring & service_binary_path, DWORD dwStartType) {
+	Utils::Output(Utils::StringFormat(L"CServiceBase::InstallService service_name: %s, service_display_name: %s, service_description: %s, service_binary_path: %s", service_name.c_str(), service_display_name.c_str(), service_description.c_str(), service_binary_path.c_str()));
+	SC_HANDLE hSCManager = ::OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCManager) {
+		Utils::Output(Utils::StringFormat(L"OpenSCManager Error: %s", Utils::GetLastErrorString().c_str()));
+		return false;
+	}
+
+	SC_HANDLE hService = ::CreateService(hSCManager, service_name.c_str(), service_display_name.c_str(), SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, dwStartType, SERVICE_ERROR_NORMAL, service_binary_path.c_str(), NULL, NULL, NULL, NULL, NULL);
+	if (!hService) {
+		Utils::Output(Utils::StringFormat(L"CreateService Error: %s", Utils::GetLastErrorString().c_str()));
+		CloseServiceHandle(hSCManager);
+		return false;
+	}
+
+	SERVICE_DESCRIPTION sd;
+	sd.lpDescription = const_cast<LPWSTR>(service_description.c_str());
+	if (!::ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd)) {
+		Utils::Output(Utils::StringFormat(L"ChangeServiceConfig2 Error: %s", Utils::GetLastErrorString().c_str()));
+		CloseServiceHandle(hService);
+		CloseServiceHandle(hSCManager);
+		return false;
+	}
+
+	CloseServiceHandle(hService);
+	CloseServiceHandle(hSCManager);
+	return true;
+}
+
+bool CServiceBase::UnInstallService(const std::wstring & service_name) {
+	Utils::Output(Utils::StringFormat(L"CServiceBase::UnInstallService service_name: %s", service_name.c_str()));
+	SC_HANDLE hSCManager = ::OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if (!hSCManager) {
+		Utils::Output(Utils::StringFormat(L"OpenSCManager Error: %s", Utils::GetLastErrorString().c_str()));
+		return false;
+	}
+
+	SC_HANDLE hService = ::OpenService(hSCManager, service_name.c_str(), SERVICE_ALL_ACCESS);
+	if (!hService) {
+		Utils::Output(Utils::StringFormat(L"OpenService Error: %s", Utils::GetLastErrorString().c_str()));
+		CloseServiceHandle(hSCManager);
+		return false;
+	}
+
+	SERVICE_STATUS status = { 0 };
+	if (!::QueryServiceStatus(hService, &status))
+	{
+		Utils::Output(Utils::StringFormat(L"QueryServiceStatus Error: %s", Utils::GetLastErrorString().c_str()));
+		CloseServiceHandle(hService);
+		CloseServiceHandle(hSCManager);
+		return false;
+	}
+
+	if (status.dwCurrentState != SERVICE_STOPPED) {
+		if (status.dwCurrentState == SERVICE_RUNNING || status.dwCurrentState == SERVICE_PAUSED) {
+			if (!::ControlService(hService, SERVICE_CONTROL_STOP, &status)) {
+				Utils::Output(Utils::StringFormat(L"ControlService STOP Error: %s", Utils::GetLastErrorString().c_str()));
+				CloseServiceHandle(hService);
+				CloseServiceHandle(hSCManager);
+				return false;
+			}
+		} else {
+			Utils::Output(Utils::StringFormat(L"dwCurrentState: %s, NOT RUNNING OR PAUSED", GetServiceStatusString(status.dwCurrentState)));
+			return false;
+		}
+	}
+
+	if (!::DeleteService(hService)) {
+		Utils::Output(Utils::StringFormat(L"DeleteService Error: %s", Utils::GetLastErrorString().c_str()));
+		CloseServiceHandle(hService);
+		CloseServiceHandle(hSCManager);
+		return false;
+	}
+
+	CloseServiceHandle(hService);
+	CloseServiceHandle(hSCManager);
+	return true;
+}
+
 bool CServiceBase::Run(CServiceBase * service) {
+	Utils::Output(Utils::StringFormat(L"CServiceBase::Run service: %p", service));
 	if (!service) {
 		return false;
 	}
@@ -24,6 +106,10 @@ bool CServiceBase::Run(CServiceBase * service) {
 }
 
 VOID WINAPI CServiceBase::ServiceMain(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors) {
+	Utils::CFileLog log;
+	log.SetLogFileNameFormat(L"Service_%02d%02d%02d.log");
+	Utils::SetLog(&log);
+	Utils::Output(Utils::StringFormat(L"CServiceBase::ServiceMain dwNumServicesArgs: %u, lpServiceArgVectors: %p", dwNumServicesArgs, lpServiceArgVectors));
 	assert(NULL != ServiceInstance);
 	ServiceInstance->service_status_handle_ = ::RegisterServiceCtrlHandlerEx(ServiceInstance->service_name_.c_str(), CServiceBase::ServiceCtrlHandler, reinterpret_cast<LPVOID>(ServiceInstance));
 	if (ServiceInstance->service_status_handle_) {
@@ -31,9 +117,11 @@ VOID WINAPI CServiceBase::ServiceMain(DWORD dwNumServicesArgs, LPWSTR * lpServic
 	}
 	delete ServiceInstance;
 	ServiceInstance = NULL;
+	Utils::SetLog(NULL);
 }
 
 DWORD WINAPI CServiceBase::ServiceCtrlHandler(DWORD dwControl, DWORD dwEventType, LPVOID lpEventData, LPVOID lpContext) {
+	Utils::Output(Utils::StringFormat(L"CServiceBase::ServiceCtrlHandler dwControl: %s, dwEventType: %u, lpEventData: %p, lpContext: %p", GetServiceControlString(dwControl), dwEventType, lpEventData, lpContext));
 	if (!lpContext) {
 		return ERROR_INVALID_PARAMETER;
 	}
@@ -106,16 +194,13 @@ CServiceBase::CServiceBase(const std::wstring & service_name)
 	, can_handle_power_event_(false)
 	, can_handle_session_change_event_(false)
 	, controls_accepted_(0) {
-	log_.SetLogFileNameFormat(L"Service_%02d%02d%02d.log");
-	SetLog(&log_);
+	Utils::Output(Utils::StringFormat(L"CServiceBase::CServiceBase %s", service_name_.c_str()));
 	service_status_.dwServiceType = SERVICE_WIN32;
 	service_status_.dwServiceSpecificExitCode = NO_ERROR;
-	Utils::Output(Utils::StringFormat(L"CServiceBase::CServiceBase %s", service_name_.c_str()));
 }
 
 CServiceBase::~CServiceBase() {
 	Utils::Output(L"CServiceBase::~CServiceBase");
-	SetLog(NULL);
 }
 
 void CServiceBase::Run(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors) {
@@ -129,7 +214,7 @@ void CServiceBase::Run(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors) {
 }
 
 void CServiceBase::ReportServiceStatus(DWORD dwCurrentState, DWORD dwWin32ExitCode, DWORD dwWaitHint) {
-	Utils::Output(Utils::StringFormat(L"CServiceBase::ReportServiceStatus dwCurrentState: %u, dwWin32ExitCode: %u, dwWaitHint: %u", dwCurrentState, dwWin32ExitCode, dwWaitHint));
+	Utils::Output(Utils::StringFormat(L"CServiceBase::ReportServiceStatus dwCurrentState: %s, dwWin32ExitCode: %u, dwWaitHint: %u", GetServiceStatusString(dwCurrentState), dwWin32ExitCode, dwWaitHint));
 	service_status_.dwCurrentState = dwCurrentState;
 	service_status_.dwWin32ExitCode = dwWin32ExitCode;
 	service_status_.dwWaitHint = dwWaitHint;
@@ -150,7 +235,6 @@ void CServiceBase::ReportServiceStatus(DWORD dwCurrentState, DWORD dwWin32ExitCo
 }
 
 DWORD CServiceBase::UpdateControlsAccepted() {
-
 	DWORD dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_PAUSE_CONTINUE | SERVICE_ACCEPT_SHUTDOWN | SERVICE_ACCEPT_POWEREVENT | SERVICE_ACCEPT_SESSIONCHANGE;
 	if (!can_stop_) {
 		dwControlsAccepted &= ~SERVICE_ACCEPT_STOP;
@@ -214,7 +298,7 @@ void CServiceBase::OnCustomCommand(DWORD command) {
 // 32787 (0x8013)
 // 
 void CServiceBase::OnPowerEvent(DWORD dwEventType, PPOWERBROADCAST_SETTING pSetting) {
-	Utils::Output(Utils::StringFormat(L"CServiceBase::OnPowerEvent dwEventType: %u, pSetting: %p", dwEventType, pSetting));
+	Utils::Output(Utils::StringFormat(L"CServiceBase::OnPowerEvent dwEventType: %s, pSetting: %p", GetPBTString(dwEventType), pSetting));
 }
 
 // 
@@ -254,7 +338,7 @@ void CServiceBase::OnPowerEvent(DWORD dwEventType, PPOWERBROADCAST_SETTING pSett
 // (0xB)
 // 
 void CServiceBase::OnSessionChange(DWORD dwEventType, PWTSSESSION_NOTIFICATION pNotification) {
-	Utils::Output(Utils::StringFormat(L"CServiceBase::OnSessionChange dwEventType: %u, dwSessionId: %u", dwEventType, pNotification->dwSessionId));
+	Utils::Output(Utils::StringFormat(L"CServiceBase::OnSessionChange dwEventType: %s, dwSessionId: %u", GetWTSString(dwEventType), pNotification->dwSessionId));
 }
 
 }
