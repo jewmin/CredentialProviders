@@ -15,45 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FileLog.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Utils.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CriticalSection.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="WindowsHelper.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="ServiceBase.cpp">
+    <ClCompile Include="DemoService.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileLog.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Utils.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="CriticalSection.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ILog.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="Header.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowsHelper.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="ServiceBase.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="IService.h">
+    <ClInclude Include="DemoService.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

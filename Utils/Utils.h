@@ -1,7 +1,6 @@
 #pragma once
 
 #include "ILog.h"
-#include "IUserLogin.h"
 
 namespace Utils {
 
@@ -15,6 +14,8 @@ std::string WToA(const std::wstring & input);
 std::string WToA(const wchar_t * input);
 std::string WToA(const wchar_t * input, const size_t len);
 
-void SetUserLogin(IUserLogin * user_login);
+std::wstring AToW(const std::string & input);
+std::wstring AToW(const char * input);
+std::wstring AToW(const char * input, const size_t len);
 
 }

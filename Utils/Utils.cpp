@@ -5,7 +5,6 @@
 namespace Utils {
 
 static ILog * g_log = NULL;
-static IUserLogin * g_user_login = NULL;
 
 void SetLog(ILog * log) {
 	g_log = log;
@@ -85,8 +84,30 @@ std::string WToA(const wchar_t * input, const size_t len) {
 	return output;
 }
 
-void SetUserLogin(IUserLogin * user_login) {
-	g_user_login = user_login;
+std::wstring AToW(const std::string & input) {
+	return AToW(input.c_str(), input.length());
+}
+
+std::wstring AToW(const char * input) {
+	if (!input) {
+		return L"";
+	}
+
+	return AToW(input, strlen(input));
+}
+
+std::wstring AToW(const char * input, const size_t len) {
+	std::wstring output;
+
+	if (len != 0) {
+		int output_len = ::MultiByteToWideChar(CP_GBK, 0, input, static_cast<int>(len), NULL, 0);
+		if (output_len > 0) {
+			output.resize(output_len);
+			::MultiByteToWideChar(CP_GBK, 0, input, static_cast<int>(len), const_cast<wchar_t *>(output.c_str()), static_cast<int>(output.length()));
+		}
+	}
+
+	return output;
 }
 
 }
