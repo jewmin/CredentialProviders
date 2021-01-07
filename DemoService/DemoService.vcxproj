@@ -142,9 +142,11 @@
   <ItemGroup>
     <ClCompile Include="DemoService.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MyService.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DemoService.h" />
+    <ClInclude Include="MyService.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

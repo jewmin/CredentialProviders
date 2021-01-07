@@ -138,6 +138,7 @@
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IService.h" />
     <ClInclude Include="ServiceBase.h" />
+    <ClInclude Include="SessionProperties.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="WindowsHelper.h" />
   </ItemGroup>

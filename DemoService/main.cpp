@@ -7,7 +7,7 @@
 int wmain(int argc, const wchar_t ** argv)
 {
 	Utils::CFileLog log;
-	log.SetLogFileNameFormat(L"ServiceRun_%02d%02d%02d.log");
+	log.SetLogFileNameFormat(L"ServiceStart_%02d%02d%02d.log");
 	Utils::SetLog(&log);
 
 	if (argc == 2) {

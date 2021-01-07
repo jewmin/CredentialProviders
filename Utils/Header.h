@@ -7,3 +7,4 @@
 #include <LM.h>
 #include <winnt.h>
 #include <assert.h>
+#include <map>

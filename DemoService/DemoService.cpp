@@ -1,9 +1,12 @@
 #include "DemoService.h"
+#include "MyService.h"
+#include "SessionProperties.h"
+#include "WindowsHelper.h"
 
 namespace Utils {
 
 CDemoService::CDemoService(const std::wstring & service_name)
-	: CServiceBase(service_name) {
+	: CServiceBase(service_name), service_(new MyService()) {
 	can_shutdown_ = true;
 	can_handle_session_change_event_ = true;
 	Utils::Output(Utils::StringFormat(L"<libuv> %s", Utils::AToW(uv_version_string()).c_str()));
@@ -13,6 +16,9 @@ CDemoService::CDemoService(const std::wstring & service_name)
 
 CDemoService::~CDemoService() {
 	uv_loop_close(&event_loop_);
+	if (service_) {
+		delete service_;
+	}
 }
 
 void CDemoService::RunService() {
@@ -47,30 +53,26 @@ void CDemoService::OnShutdown() {
 void CDemoService::OnSessionChange(DWORD dwEventType, PWTSSESSION_NOTIFICATION pNotification) {
 	switch (dwEventType) {
 	case WTS_SESSION_LOGON:
-		Utils::Output(Utils::StringFormat(L"会话[%u]登录", pNotification->dwSessionId));
 		if (service_) {
-			service_->OnLogon();
+			service_->OnLogon(SessionProperties(pNotification->dwSessionId, Utils::GetSessionUserName(pNotification->dwSessionId)));
 		}
 		break;
 
 	case WTS_SESSION_LOGOFF:
-		Utils::Output(Utils::StringFormat(L"会话[%u]注销", pNotification->dwSessionId));
 		if (service_) {
-			service_->OnLogoff();
+			service_->OnLogoff(SessionProperties(pNotification->dwSessionId));
 		}
 		break;
 
 	case WTS_SESSION_LOCK:
-		Utils::Output(Utils::StringFormat(L"会话[%u]锁定", pNotification->dwSessionId));
 		if (service_) {
-			service_->OnLock();
+			service_->OnLock(SessionProperties(pNotification->dwSessionId));
 		}
 		break;
 
 	case WTS_SESSION_UNLOCK:
-		Utils::Output(Utils::StringFormat(L"会话[%u]解锁", pNotification->dwSessionId));
 		if (service_) {
-			service_->OnUnLock();
+			service_->OnUnLock(SessionProperties(pNotification->dwSessionId));
 		}
 		break;
 	}
