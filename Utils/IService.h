@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SessionProperties.h"
+#include "Protocol/LoginRequest.h"
+#include "Protocol/LoginResponse.h"
 
 namespace Utils {
 
@@ -8,6 +10,8 @@ class IService {
 public:
 	// 初始化回调
 	virtual void OnInited() = 0;
+	// 授权验证
+	virtual Protocol::LoginResponse Auth(Protocol::LoginRequest request) = 0;
 	// 登录回调
 	virtual void OnLogon(SessionProperties session) = 0;
 	// 注销回调

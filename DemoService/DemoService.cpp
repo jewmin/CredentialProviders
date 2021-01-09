@@ -34,7 +34,20 @@ void CDemoService::OnStart(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors
 	if (service_) {
 		service_->OnInited();
 	}
+
 	uv_async_init(&event_loop_, &event_notify_, NULL);
+
+	int status;
+	uv_pipe_t * server = CreatePipe(&event_loop_);
+	if ((status = uv_pipe_bind(server, PIPENAME))) {
+		Utils::Output(Utils::StringFormat(L"绑定命名管道[%s] - Error: %s %s", Utils::AToW(PIPENAME), Utils::AToW(uv_err_name(status)), Utils::AToW(uv_strerror(status))));
+		ClosePipe(server);
+		return;
+	}
+	if ((status = uv_listen(reinterpret_cast<uv_stream_t *>(server), 128, CDemoService::UvConnectionCb))) {
+		Utils::Output(Utils::StringFormat(L"监听命名管道[%s] - Error: %s %s", Utils::AToW(PIPENAME), Utils::AToW(uv_err_name(status)), Utils::AToW(uv_strerror(status))));
+		ClosePipe(server);
+	}
 }
 
 void CDemoService::OnStop() {
@@ -78,10 +91,67 @@ void CDemoService::OnSessionChange(DWORD dwEventType, PWTSSESSION_NOTIFICATION p
 	}
 }
 
+uv_pipe_t * CDemoService::CreatePipe(uv_loop_t * loop) {
+	uv_pipe_t * handle = static_cast<uv_pipe_t *>(malloc(sizeof(uv_pipe_t)));
+	uv_pipe_init(loop, handle, 0);
+	handle->data = NULL;
+	return handle;
+}
+
+void CDemoService::ClosePipe(uv_pipe_t * handle) {
+	uv_close(reinterpret_cast<uv_handle_t *>(handle), CDemoService::UvCloseCb);
+}
+
 void CDemoService::UvWalkCb(uv_handle_t* handle, void* arg) {
 	if (!uv_is_closing(handle)) {
-		uv_close(handle, NULL);
+		if (handle->type == UV_NAMED_PIPE) {
+			ClosePipe(reinterpret_cast<uv_pipe_t *>(handle));
+		} else {
+			uv_close(handle, NULL);
+		}
 	}
+}
+
+void CDemoService::UvCloseCb(uv_handle_t* handle) {
+	if (handle->data) {
+		free(handle->data);
+	}
+	free(handle);
+}
+
+void CDemoService::UvConnectionCb(uv_stream_t* server, int status) {
+	if (status == -1) {
+		Utils::Output(Utils::StringFormat(L"监听命名管道[%s]回调 - Error: %s %s", Utils::AToW(PIPENAME), Utils::AToW(uv_err_name(status)), Utils::AToW(uv_strerror(status))));
+		return;
+	}
+
+	uv_pipe_t * client = CreatePipe(server->loop);
+	if ((status = uv_accept(server, reinterpret_cast<uv_stream_t *>(client)))) {
+		Utils::Output(Utils::StringFormat(L"连接命名管道[%s] - Error: %s %s", Utils::AToW(PIPENAME), Utils::AToW(uv_err_name(status)), Utils::AToW(uv_strerror(status))));
+		ClosePipe(client);
+	} else {
+		uv_read_start(reinterpret_cast<uv_stream_t *>(client), CDemoService::UvAllocCb, CDemoService::UvReadCb);
+	}
+}
+
+void CDemoService::UvAllocCb(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf) {
+	buf->base = static_cast<char *>(malloc(suggested_size));
+	buf->len = static_cast<ULONG>(suggested_size);
+}
+
+void CDemoService::UvReadCb(uv_stream_t* stream, ssize_t nread, const uv_buf_t* buf) {
+	if (nread < 0) {
+		if (nread == UV_EOF) {
+			Utils::Output(Utils::StringFormat(L"有名管道[%s] - 对方断开", Utils::AToW(PIPENAME)));
+		} else {
+			Utils::Output(Utils::StringFormat(L"有名管道[%s] - 接收报错: %s %s", Utils::AToW(PIPENAME), Utils::AToW(uv_err_name(nread)), Utils::AToW(uv_strerror(nread))));
+		}
+		ClosePipe(reinterpret_cast<uv_pipe_t *>(stream));
+	} else if (nread > 0) {
+		
+	}
+
+	free(buf->base);
 }
 
 }

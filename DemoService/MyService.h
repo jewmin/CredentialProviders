@@ -13,6 +13,8 @@ public:
 
 	// 初始化回调
 	virtual void OnInited();
+	// 授权验证
+	virtual Protocol::LoginResponse Auth(Protocol::LoginRequest request);
 	// 登录回调
 	virtual void OnLogon(SessionProperties session);
 	// 注销回调

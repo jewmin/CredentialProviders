@@ -18,6 +18,13 @@ void MyService::OnInited() {
 	Utils::Output(L"初始化");
 }
 
+Protocol::LoginResponse MyService::Auth(Protocol::LoginRequest request) {
+	Protocol::LoginResponse response;
+	wcscpy_s(response.UserName, request.UserName);
+	wcscpy_s(response.Password, request.Password);
+	return response;
+}
+
 void MyService::OnLogon(SessionProperties session) {
 	Utils::CCriticalSection::Owner lock(cs_);
 	Utils::Output(Utils::StringFormat(L"会话[%s(%u)]登录", session.UserName.c_str(), session.SessionID));

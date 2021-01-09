@@ -2,6 +2,7 @@
 	"files.encoding": "gbk",
 	"editor.tabSize": 4,
 	"editor.insertSpaces": false,
+	"files.eol": "\r\n",
 	"files.associations": {
 		"xstring": "cpp",
 		"ostream": "cpp",

@@ -8,3 +8,6 @@
 #include <winnt.h>
 #include <assert.h>
 #include <map>
+#include <vector>
+
+#define PIPENAME "\\\\?\\pipe\\credprov.sock"
