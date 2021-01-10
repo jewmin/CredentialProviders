@@ -8,11 +8,15 @@ namespace Protocol {
 
 class LoginRequest : public Commond {
 public:
-	LoginRequest() : Commond(REQUEST_LOGIN), SessionID(-1) {
+	LoginRequest()
+		: Commond(REQUEST_LOGIN)
+		, SessionID(-1) {
 		wmemset(UserName, 0, sizeof(UserName) / sizeof(wchar_t));
 		wmemset(Password, 0, sizeof(Password) / sizeof(wchar_t));
 	}
-	virtual ~LoginRequest() {}
+
+	virtual ~LoginRequest() {
+	}
 
 public:
 	DWORD SessionID;

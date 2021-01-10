@@ -51,7 +51,7 @@ std::wstring GetLastErrorString() {
 	LPVOID lpBuffer = NULL;
 	if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpBuffer, 0, NULL)) {
 		std::wstring result = StringFormat(L"%u %s", error_code, lpBuffer);
-		LocalFree(lpBuffer);
+		::LocalFree(lpBuffer);
 		return result;
 	}
 

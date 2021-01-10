@@ -2,6 +2,7 @@
 
 #include "ILog.h"
 #include "CriticalSection.h"
+#include "CTime.h"
 
 namespace Utils {
 
@@ -18,9 +19,7 @@ protected:
 
 private:
 	std::wstring file_name_format_;
-	int timestamp_year_;
-	int timestamp_month_;
-	int timestamp_day_;
+	CTime timestamp_;
 
 	HANDLE file_;
 	CCriticalSection cs_;

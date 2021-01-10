@@ -11,13 +11,22 @@ namespace Protocol {
 
 class Commond {
 public:
-	Commond(short cmd) : cmd_(cmd) {}
-	virtual ~Commond() {}
-	short GetCmd() const { return cmd_; }
+	Commond(WORD cmd)
+		: cmd_(cmd) {
+	}
+
+	virtual ~Commond() {
+	}
+
+	WORD GetCmd() const;
 
 private:
-	short cmd_;
+	WORD cmd_;
 };
+
+inline WORD Commond::GetCmd() const {
+	return cmd_;
+}
 
 }
 

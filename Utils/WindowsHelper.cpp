@@ -5,7 +5,7 @@ namespace Utils {
 std::wstring GetMachineName() {
 	WCHAR wsz[MAX_COMPUTERNAME_LENGTH + 1];
 	DWORD cch = ARRAYSIZE(wsz);
-	if (GetComputerName(wsz, &cch)) {
+	if (::GetComputerName(wsz, &cch)) {
 		return wsz;
 	} else {
 		return L".";
