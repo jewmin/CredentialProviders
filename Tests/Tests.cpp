@@ -2,6 +2,7 @@
 //
 
 #include "pch.h"
+#include "Header.h"
 #include <iostream>
 #include <Windows.h>
 #include <credentialprovider.h>

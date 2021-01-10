@@ -13,15 +13,15 @@ public:
 	uv_buf_t * GetUvBuf() const;
 	size_t GetSize() const;
 	size_t GetUsed() const;
-	const unsigned char * GetBuffer() const;
+	const BYTE * GetBuffer() const;
 	void Empty();
 
 	void SetupRead();
 	void SetupWrite();
 
 	void AddData(const char * data, size_t len);
-	void AddData(const unsigned char * data, size_t len);
-	void AddData(unsigned char data);
+	void AddData(const BYTE * data, size_t len);
+	void AddData(BYTE data);
 
 	void Use(size_t used);
 	CIOBuffer * SplitBuffer(size_t remove);
@@ -32,8 +32,9 @@ public:
 	void Release();
 
 private:
-	static void * operator new(size_t obj_size, size_t buffer_size);
-	static void operator delete(void * obj, size_t buffer_size);
+	static void * operator new(size_t obj_size, size_t buffer_size, int placeholder);
+	static void operator delete(void * obj, size_t buffer_size, int placeholder);
+	static void operator delete(void * obj);
 
 private:
 	CIOBuffer(Allocator & allocator, size_t size);
@@ -46,7 +47,7 @@ private:
 	long ref_;
 	const size_t size_;
 	size_t used_;
-	unsigned char buffer_[0];
+	BYTE buffer_[1];
 };
 
 class CIOBuffer::Allocator {
@@ -95,13 +96,13 @@ inline size_t CIOBuffer::GetUsed() const {
 	return used_;
 }
 
-inline const unsigned char * CIOBuffer::GetBuffer() const {
+inline const BYTE * CIOBuffer::GetBuffer() const {
 	return &buffer_[0];
 }
 
 inline void CIOBuffer::Empty() {
 	uv_buf_.base = reinterpret_cast<char *>(buffer_);
-	uv_buf_.len = size_;
+	uv_buf_.len = static_cast<ULONG>(size_);
 
 	used_ = 0;
 }

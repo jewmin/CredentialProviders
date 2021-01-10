@@ -11,7 +11,7 @@ public:
 	// 初始化回调
 	virtual void OnInited() = 0;
 	// 授权验证
-	virtual Utils::Protocol::LoginResponse Auth(Utils::Protocol::LoginRequest request) = 0;
+	virtual void Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::LoginResponse * response) = 0;
 	// 登录回调
 	virtual void OnLogon(DWORD SessionID) = 0;
 	// 注销回调

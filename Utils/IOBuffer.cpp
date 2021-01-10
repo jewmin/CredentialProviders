@@ -10,43 +10,50 @@ CIOBuffer::CIOBuffer(Allocator & allocator, size_t size)
 	Empty();
 }
 
-void * CIOBuffer::operator new(size_t obj_size, size_t buffer_size) {
+void * CIOBuffer::operator new(size_t obj_size, size_t buffer_size, int placeholder) {
+	UNREFERENCED_PARAMETER(placeholder);
 	void * mem = new char[obj_size + buffer_size];
 	return mem;
 }
 
-void CIOBuffer::operator delete(void * obj, size_t) {
-	delete [] obj;
+void CIOBuffer::operator delete(void * obj, size_t buffer_size, int placeholder) {
+	UNREFERENCED_PARAMETER(buffer_size);
+	UNREFERENCED_PARAMETER(placeholder);
+	delete[] obj;
+}
+
+void CIOBuffer::operator delete(void * obj) {
+	delete[] obj;
 }
 
 void CIOBuffer::SetupRead() {
 	if (0 == used_) {
 		uv_buf_.base = reinterpret_cast<char *>(buffer_);
-		uv_buf_.len = size_;
+		uv_buf_.len = static_cast<ULONG>(size_);
 	} else {
 		uv_buf_.base = reinterpret_cast<char *>(buffer_) + used_;
-		uv_buf_.len = size_ - used_;
+		uv_buf_.len = static_cast<ULONG>(size_ - used_);
 	}
 }
 
 void CIOBuffer::SetupWrite() {
 	uv_buf_.base = reinterpret_cast<char *>(buffer_);
-	uv_buf_.len = used_;
+	uv_buf_.len = static_cast<ULONG>(used_);
 
 	used_ = 0;
 }
 
 void CIOBuffer::AddData(const char * data, size_t len) {
-	AddData(reinterpret_cast<const unsigned char *>(data), len);
+	AddData(reinterpret_cast<const BYTE *>(data), len);
 }
 
-void CIOBuffer::AddData(const unsigned char * data, size_t len) {
+void CIOBuffer::AddData(const BYTE * data, size_t len) {
 	assert(len <= size_ - used_);
 	memcpy(buffer_ + used_, data, len);
 	used_ += len;
 }
 
-void CIOBuffer::AddData(unsigned char data) {
+void CIOBuffer::AddData(BYTE data) {
 	AddData(&data, 1);
 }
 
@@ -114,7 +121,7 @@ CIOBuffer * CIOBuffer::Allocator::Allocate() {
 		free_list_.pop_front();
 		new_buffer->AddRef();
 	} else {
-		new_buffer = new(buffer_size_)CIOBuffer(*this, buffer_size_);
+		new_buffer = new(buffer_size_, 0)CIOBuffer(*this, buffer_size_);
 		OnBufferCreated();
 	}
 

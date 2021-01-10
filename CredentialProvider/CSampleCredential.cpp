@@ -12,6 +12,7 @@
 #include <ntstatus.h>
 #define WIN32_NO_STATUS
 #endif
+#include "Header.h"
 #include <unknwn.h>
 #include "CSampleCredential.h"
 #include "guid.h"

@@ -9,7 +9,7 @@ namespace Utils {
 class SessionProperties {
 public:
 	SessionProperties()
-		: SessionID(-1)
+		: SessionID((DWORD)-1)
 		, UserName(L"")
 		, Password(L"") {
 	}

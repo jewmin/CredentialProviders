@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="头文件\Protocol">
+      <UniqueIdentifier>{7775fce7-9324-45fb-9399-461037d01082}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="FileLog.cpp">
@@ -28,6 +31,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ServiceBase.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CTime.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="IOBuffer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UvHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -58,6 +70,24 @@
     </ClInclude>
     <ClInclude Include="SessionProperties.h">
       <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CTime.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="IOBuffer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="UvHandler.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol\Commond.h">
+      <Filter>头文件\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol\LoginRequest.h">
+      <Filter>头文件\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Protocol\LoginResponse.h">
+      <Filter>头文件\Protocol</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
