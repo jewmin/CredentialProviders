@@ -9,7 +9,7 @@
 // Helper functions for copying parameters and packaging the buffer
 // for GetSerialization.
 
-
+#include "Header.h"
 #include "helpers.h"
 #include <intsafe.h>
 #include <wincred.h>

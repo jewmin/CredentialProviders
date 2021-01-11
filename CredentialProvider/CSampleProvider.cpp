@@ -11,6 +11,7 @@
 // In this sample, we will display one tile that uses each of the nine
 // available UI controls.
 
+#include <WinSock2.h>
 #include <credentialprovider.h>
 #include <propkey.h>
 #include "CSampleProvider.h"

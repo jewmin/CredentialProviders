@@ -8,6 +8,7 @@
 //
 // Standard dll required functions and class factory implementation.
 
+#include "Header.h"
 #include <windows.h>
 #include <unknwn.h>
 #include "Dll.h"

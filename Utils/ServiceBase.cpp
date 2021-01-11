@@ -18,7 +18,7 @@ bool CServiceBase::InstallService(const std::wstring & service_name, const std::
 	SC_HANDLE hService = ::CreateService(hSCManager, service_name.c_str(), service_display_name.c_str(), SERVICE_ALL_ACCESS, SERVICE_WIN32_OWN_PROCESS, dwStartType, SERVICE_ERROR_NORMAL, service_binary_path.c_str(), NULL, NULL, NULL, NULL, NULL);
 	if (!hService) {
 		Utils::Output(Utils::StringFormat(L"CreateService Error: %s", Utils::GetLastErrorString().c_str()));
-		CloseServiceHandle(hSCManager);
+		::CloseServiceHandle(hSCManager);
 		return false;
 	}
 
@@ -26,13 +26,13 @@ bool CServiceBase::InstallService(const std::wstring & service_name, const std::
 	sd.lpDescription = const_cast<LPWSTR>(service_description.c_str());
 	if (!::ChangeServiceConfig2(hService, SERVICE_CONFIG_DESCRIPTION, &sd)) {
 		Utils::Output(Utils::StringFormat(L"ChangeServiceConfig2 Error: %s", Utils::GetLastErrorString().c_str()));
-		CloseServiceHandle(hService);
-		CloseServiceHandle(hSCManager);
+		::CloseServiceHandle(hService);
+		::CloseServiceHandle(hSCManager);
 		return false;
 	}
 
-	CloseServiceHandle(hService);
-	CloseServiceHandle(hSCManager);
+	::CloseServiceHandle(hService);
+	::CloseServiceHandle(hSCManager);
 	return true;
 }
 
@@ -47,7 +47,7 @@ bool CServiceBase::UnInstallService(const std::wstring & service_name) {
 	SC_HANDLE hService = ::OpenService(hSCManager, service_name.c_str(), SERVICE_ALL_ACCESS);
 	if (!hService) {
 		Utils::Output(Utils::StringFormat(L"OpenService Error: %s", Utils::GetLastErrorString().c_str()));
-		CloseServiceHandle(hSCManager);
+		::CloseServiceHandle(hSCManager);
 		return false;
 	}
 
@@ -55,8 +55,8 @@ bool CServiceBase::UnInstallService(const std::wstring & service_name) {
 	if (!::QueryServiceStatus(hService, &status))
 	{
 		Utils::Output(Utils::StringFormat(L"QueryServiceStatus Error: %s", Utils::GetLastErrorString().c_str()));
-		CloseServiceHandle(hService);
-		CloseServiceHandle(hSCManager);
+		::CloseServiceHandle(hService);
+		::CloseServiceHandle(hSCManager);
 		return false;
 	}
 
@@ -64,8 +64,8 @@ bool CServiceBase::UnInstallService(const std::wstring & service_name) {
 		if (status.dwCurrentState == SERVICE_RUNNING || status.dwCurrentState == SERVICE_PAUSED) {
 			if (!::ControlService(hService, SERVICE_CONTROL_STOP, &status)) {
 				Utils::Output(Utils::StringFormat(L"ControlService STOP Error: %s", Utils::GetLastErrorString().c_str()));
-				CloseServiceHandle(hService);
-				CloseServiceHandle(hSCManager);
+				::CloseServiceHandle(hService);
+				::CloseServiceHandle(hSCManager);
 				return false;
 			}
 		} else {
@@ -76,13 +76,13 @@ bool CServiceBase::UnInstallService(const std::wstring & service_name) {
 
 	if (!::DeleteService(hService)) {
 		Utils::Output(Utils::StringFormat(L"DeleteService Error: %s", Utils::GetLastErrorString().c_str()));
-		CloseServiceHandle(hService);
-		CloseServiceHandle(hSCManager);
+		::CloseServiceHandle(hService);
+		::CloseServiceHandle(hSCManager);
 		return false;
 	}
 
-	CloseServiceHandle(hService);
-	CloseServiceHandle(hSCManager);
+	::CloseServiceHandle(hService);
+	::CloseServiceHandle(hSCManager);
 	return true;
 }
 

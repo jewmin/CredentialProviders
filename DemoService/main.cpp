@@ -32,7 +32,7 @@ int wmain(int argc, const wchar_t ** argv)
 		}
 	}
 
-	Utils::CServiceBase::Run(new Utils::CDemoService(SERVER_NAME));
+	Utils::CServiceBase::Run(new DemoService::CDemoService(SERVER_NAME));
 	Utils::SetLog(NULL);
 	return 0;
 }

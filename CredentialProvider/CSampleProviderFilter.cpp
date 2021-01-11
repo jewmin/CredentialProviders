@@ -1,3 +1,4 @@
+#include "Header.h"
 #include <credentialprovider.h>
 #include "CSampleProviderFilter.h"
 #include "guid.h"
