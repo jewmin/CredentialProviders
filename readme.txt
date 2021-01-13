@@ -34,3 +34,19 @@ SampleCredUICredentialProvider: demonstrates a credential provider that runs in 
 SampleHardwareEventCredentialProvider: demonstrates how a credential provider can respond to a hardware event such as smart card removal/insertion.
 
 SampleWrapExistingCredentialProvider: demonstrates how a credential provider can "wrap" or contain another credential provider in order to add functionality.
+
+使用说明
+
+1）安装凭证
+如果是x86系统，复制Win32的dll到C:\Windows\System32目录
+如果是x64系统，复制x64的dll到C:\Windows\System32目录
+管理员权限运行Register.reg
+
+2）卸装凭证
+管理员权限运行Unregister.reg
+
+3）安装服务
+使用管理员权限运行cmd，在cmd中执行指令DemoService.exe --install，然后可在服务管理中找到对应服务Demo Service
+
+4）卸装服务
+使用管理员权限运行cmd，在cmd中执行指令DemoService.exe --uninstall
