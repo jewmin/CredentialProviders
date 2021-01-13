@@ -27,7 +27,9 @@ enum SAMPLE_FIELD_ID
     SFI_CHECKBOX        = 6,
     SFI_COMBOBOX        = 7,
     SFI_COMMAND_LINK    = 8,
-    SFI_NUM_FIELDS      = 9,  // Note: if new fields are added, keep NUM_FIELDS last.  This is used as a count of the number of fields
+	SFI_USERNAME        = 9,
+	SFI_FAILURE_TEXT    = 10,
+    SFI_NUM_FIELDS      = 11,  // Note: if new fields are added, keep NUM_FIELDS last.  This is used as a count of the number of fields
 };
 
 // The first value indicates when the tile is displayed (selected, not selected)
@@ -56,6 +58,8 @@ static const FIELD_STATE_PAIR s_rgFieldStatePairs[] =
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE  },         // SFI_CHECKBOX   
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE    },       // SFI_COMBOBOX   
     { CPFS_DISPLAY_IN_SELECTED_TILE, CPFIS_NONE    },       // SFI_COMMAND_LINK   
+	{ CPFS_HIDDEN, CPFIS_NONE},                             // SFI_USERNAME
+	{ CPFS_HIDDEN, CPFIS_NONE},                             // SFI_FAILURE_TEXT
 };
 
 // Field descriptors for unlock and logon.
@@ -73,6 +77,8 @@ static const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR s_rgCredProvFieldDescriptors[]
     { SFI_CHECKBOX, CPFT_CHECKBOX, L"Checkbox" },
     { SFI_COMBOBOX, CPFT_COMBOBOX, L"Combobox" },
     { SFI_COMMAND_LINK, CPFT_COMMAND_LINK, L"CommandLink" },
+	{ SFI_USERNAME, CPFT_EDIT_TEXT, L"UserName" },
+	{ SFI_FAILURE_TEXT, CPFT_SMALL_TEXT, L"Failure" },
 };
 
 static const PWSTR s_rgComboBoxStrings[] =

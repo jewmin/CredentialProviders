@@ -11,31 +11,55 @@
 #include "FileLog.h"
 #include "WindowsHelper.h"
 #include "ServiceBase.h"
+#include "UvHandler.h"
+#include "Protocol/LoginRequest.h"
+#include "Protocol/LoginResponse.h"
 
-#define enum2string(val) L#val
+//#define enum2string(val) L#val
+//
+//class DemoService : public Utils::CServiceBase {
+//public:
+//	DemoService() : CServiceBase(L"DemoService"), shutdown_(false) {
+//		can_shutdown_ = true;
+//		// can_pause_and_continue_ = true;
+//		can_handle_power_event_ = true;
+//		can_handle_session_change_event_ = true;
+//	}
+//	virtual ~DemoService() {
+//
+//	}
+//	virtual void RunService() {
+//		while (!shutdown_) {
+//			Sleep(16);
+//		}
+//	}
+//	virtual void OnStop() {
+//		CServiceBase::OnStop();
+//		shutdown_ = true;
+//	}
+//private:
+//	bool shutdown_;
+//};
 
-class DemoService : public Utils::CServiceBase {
+class AuthClient : public Utils::UvHandler {
 public:
-	DemoService() : CServiceBase(L"DemoService"), shutdown_(false) {
-		can_shutdown_ = true;
-		// can_pause_and_continue_ = true;
-		can_handle_power_event_ = true;
-		can_handle_session_change_event_ = true;
-	}
-	virtual ~DemoService() {
+	AuthClient() {}
+	virtual ~AuthClient() {}
 
+	void Auth() {
+		EventInitClient();
+		EventPoll(UV_RUN_DEFAULT);
 	}
-	virtual void RunService() {
-		while (!shutdown_) {
-			Sleep(16);
-		}
+
+protected:
+	virtual void ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buffer) {
+		UNREFERENCED_PARAMETER(pipe);
+		UNREFERENCED_PARAMETER(buffer);
 	}
-	virtual void OnStop() {
-		CServiceBase::OnStop();
-		shutdown_ = true;
+	virtual void OnConnected(uv_pipe_t * pipe, bool status) {
+		UNREFERENCED_PARAMETER(pipe);
+		UNREFERENCED_PARAMETER(status);
 	}
-private:
-	bool shutdown_;
 };
 
 int wmain(int argc, const wchar_t ** argv)
@@ -54,17 +78,17 @@ int wmain(int argc, const wchar_t ** argv)
 
 	// CredUIPromptForWindowsCredentials(&credUiInfo, 0, &authPackage, NULL, 0, &authBuffer, &authBufferSize, &save, 0);
 
-	Utils::CFileLog log;
+	/*Utils::CFileLog log;
 	Utils::SetLog(&log);
 	Utils::Output(L"test≤‚ ‘123");
 	log.SetLogFileNameFormat(L"%d%d%d.log");
 	Utils::Output(L"sksksjdf≤‚ ‘ø›“∂sdfk∂·");
 	Utils::WToA(NULL);
-	Utils::StringFormat(L"≤‚ ‘abc %s %d", L"«∆«∆", 1000);
+	Utils::StringFormat(L"≤‚ ‘abc %s %d", L"«∆«∆", 1000);*/
 	// Utils::Output(enum2string(CPUS_LOGON));
 	// CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus = CPUS_UNLOCK_WORKSTATION;
 	// Utils::Output(enum2string(CREDENTIAL_PROVIDER_USAGE_SCENARIO(cpus)));
-	PWTS_SESSION_INFOW infos;
+	/*PWTS_SESSION_INFOW infos;
 	DWORD count;
 	if (::WTSEnumerateSessions(WTS_CURRENT_SERVER_HANDLE, 0, 1, &infos, &count)) {
 		for (DWORD i = 0; i < count; i++) {
@@ -96,7 +120,10 @@ int wmain(int argc, const wchar_t ** argv)
 		}
 	}
 
-	Utils::CServiceBase::Run(new DemoService());
+	Utils::CServiceBase::Run(new DemoService());*/
+
+	AuthClient client;
+	client.Auth();
 
 	return 0;
 }

@@ -23,8 +23,7 @@
 
 CSampleCredential::CSampleCredential():
     _cRef(1),
-    _pCredProvCredentialEvents(NULL),
-	_bConnectCanceled(false)
+    _pCredProvCredentialEvents(NULL)
 {
 	Utils::Output(L"CSampleCredential::CSampleCredential");
     DllAddRef();
@@ -86,7 +85,7 @@ HRESULT CSampleCredential::Initialize(
     }
     if (SUCCEEDED(hr))
     {
-        hr = SHStrDupW(L"admin", &_rgFieldStrings[SFI_EDIT_TEXT]);
+        hr = SHStrDupW(L"", &_rgFieldStrings[SFI_EDIT_TEXT]);
     }
     if (SUCCEEDED(hr))
     {
@@ -108,6 +107,14 @@ HRESULT CSampleCredential::Initialize(
     {
         hr = SHStrDupW(L"Command Link", &_rgFieldStrings[SFI_COMMAND_LINK]);
     }
+	if (SUCCEEDED(hr))
+	{
+		hr = SHStrDupW(L"", &_rgFieldStrings[SFI_USERNAME]);
+	}
+	if (SUCCEEDED(hr))
+	{
+		hr = SHStrDupW(L"", &_rgFieldStrings[SFI_FAILURE_TEXT]);
+	}
 
     return S_OK;
 }
@@ -294,7 +301,12 @@ HRESULT CSampleCredential::SetStringValue(
     __in PCWSTR pwz      
     )
 {
-	Utils::Output(Utils::StringFormat(L"CSampleCredential::SetStringValue dwFieldID: %u, pwz: %s", dwFieldID, pwz));
+	if (dwFieldID < ARRAYSIZE(_rgCredProvFieldDescriptors) && CPFT_EDIT_TEXT == _rgCredProvFieldDescriptors[dwFieldID].cpft) {
+		Utils::Output(Utils::StringFormat(L"CSampleCredential::SetStringValue dwFieldID: %u, pwz: %s", dwFieldID, pwz));
+	}
+	else {
+		Utils::Output(Utils::StringFormat(L"CSampleCredential::SetStringValue dwFieldID: %u", dwFieldID));
+	}
     HRESULT hr;
 
     // Validate parameters.
@@ -480,6 +492,20 @@ HRESULT CSampleCredential::CommandLinkClicked(__in DWORD dwFieldID)
     return hr;
 }
 
+struct AUTH_RESPONSE
+{
+	WORD      wResult;
+	PWSTR     pwzMessage;
+};
+
+static const AUTH_RESPONSE s_rgAuthResponse[] =
+{
+	{ Utils::Protocol::LoginResponse::AuthFailed, L"ERROR: 授权失败" },
+	{ Utils::Protocol::LoginResponse::UserCancel, L"ERROR: 用户取消" },
+	{ Utils::Protocol::LoginResponse::Timeout, L"ERROR: 授权超时" },
+	{ Utils::Protocol::LoginResponse::ConnectFailed, L"ERROR: 连接失败" },
+};
+
 // Collect the username and password into a serialized credential for the correct usage scenario 
 // (logon/unlock is what's demonstrated in this sample).  LogonUI then passes these credentials 
 // back to the system to log on.
@@ -491,18 +517,50 @@ HRESULT CSampleCredential::GetSerialization(
     )
 {
 	Utils::Output(L"CSampleCredential::GetSerialization");
-    UNREFERENCED_PARAMETER(ppwszOptionalStatusText);
-    UNREFERENCED_PARAMETER(pcpsiOptionalStatusIcon);
+    *ppwszOptionalStatusText = NULL;
+    *pcpsiOptionalStatusIcon = CPSI_NONE;
 
-	if (_bConnectCanceled) {
-		*pcpgsr = CPGSR_NO_CREDENTIAL_NOT_FINISHED;
-		if (_pCredProvCredentialEvents) {
+	HRESULT hr;
+
+	if (_response.Result != Utils::Protocol::LoginResponse::AuthSuccess)
+	{
+		CoTaskMemFree(_rgFieldStrings[SFI_FAILURE_TEXT]);
+		hr = SHStrDupW(L"未知错误，请联系管理员", &_rgFieldStrings[SFI_FAILURE_TEXT]);
+		if (SUCCEEDED(hr))
+		{
+			for (DWORD i = 0; i < ARRAYSIZE(s_rgAuthResponse); i++)
+			{
+				if (s_rgAuthResponse[i].wResult == _response.Result)
+				{
+					CoTaskMemFree(_rgFieldStrings[SFI_FAILURE_TEXT]);
+					hr = SHStrDupW(s_rgAuthResponse[i].pwzMessage, &_rgFieldStrings[SFI_FAILURE_TEXT]);
+					break;
+				}
+			}
+		}
+
+		if (SUCCEEDED(hr) && _pCredProvCredentialEvents)
+		{
+			_pCredProvCredentialEvents->SetFieldString(this, SFI_FAILURE_TEXT, _rgFieldStrings[SFI_FAILURE_TEXT]);
+			_pCredProvCredentialEvents->SetFieldState(this, SFI_FAILURE_TEXT, CPFS_DISPLAY_IN_SELECTED_TILE);
 			_pCredProvCredentialEvents->SetFieldString(this, SFI_PASSWORD, L"");
 		}
+
+		if (SUCCEEDED(hr))
+		{
+			if (SUCCEEDED(SHStrDupW(_rgFieldStrings[SFI_FAILURE_TEXT], ppwszOptionalStatusText)))
+			{
+				*pcpsiOptionalStatusIcon = CPSI_ERROR;
+			}
+		}
+		*pcpgsr = CPGSR_NO_CREDENTIAL_NOT_FINISHED;
 		return E_UNEXPECTED;
 	}
 
-    HRESULT hr;
+	if (_pCredProvCredentialEvents)
+	{
+		_pCredProvCredentialEvents->SetFieldState(this, SFI_FAILURE_TEXT, CPFS_HIDDEN);
+	}
 
     WCHAR wsz[MAX_COMPUTERNAME_LENGTH+1];
     DWORD cch = ARRAYSIZE(wsz);
@@ -516,7 +574,7 @@ HRESULT CSampleCredential::GetSerialization(
         {
             KERB_INTERACTIVE_UNLOCK_LOGON kiul;
 
-            hr = KerbInteractiveUnlockLogonInit(wsz, _rgFieldStrings[SFI_EDIT_TEXT], pwzProtectedPassword, _cpus, &kiul);
+            hr = KerbInteractiveUnlockLogonInit(wsz, _rgFieldStrings[SFI_USERNAME], pwzProtectedPassword, _cpus, &kiul);
 
             if (SUCCEEDED(hr))
             {
@@ -623,22 +681,19 @@ HRESULT CSampleCredential::ReportResult(
 HRESULT CSampleCredential::Connect(_In_ IQueryContinueWithStatus* pqcws)
 {
 	Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect pqcws: %p", pqcws));
-	_bConnectCanceled = false;
-	if (pqcws != nullptr) {
-		pqcws->SetStatusMessage(L"连接中...");
-		HRESULT hr;
-		int count = 10;
-		while (count-- > 0) {
-			Sleep(500);
-			hr = pqcws->QueryContinue();
-			Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect hr: %d", hr));
-			if (!SUCCEEDED(hr)) {
-				Utils::Output(L"CSampleCredential::Connect Cancel");
-				_bConnectCanceled = true;
-				return E_FAIL;
-			}
-		}
+	AuthClient client(5000, pqcws);
+	Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), _rgFieldStrings[SFI_EDIT_TEXT], _rgFieldStrings[SFI_PASSWORD]);
+	client.Auth(&request, &_response);
+
+	HRESULT hr;
+	CoTaskMemFree(_rgFieldStrings[SFI_USERNAME]);
+	hr = SHStrDupW(_response.UserName, &_rgFieldStrings[SFI_USERNAME]);
+	if (SUCCEEDED(hr))
+	{
+		CoTaskMemFree(_rgFieldStrings[SFI_PASSWORD]);
+		hr = SHStrDupW(_response.Password, &_rgFieldStrings[SFI_PASSWORD]);
 	}
+
 	return S_OK;
 }
 

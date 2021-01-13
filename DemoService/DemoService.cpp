@@ -19,7 +19,7 @@ CDemoService::~CDemoService() {
 
 void CDemoService::RunService() {
 	EventPoll();
-	OnEventStop();
+	EventStopped();
 }
 
 void CDemoService::OnStart(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors) {
@@ -71,6 +71,7 @@ void CDemoService::OnSessionChange(DWORD dwEventType, PWTSSESSION_NOTIFICATION p
 }
 
 void CDemoService::ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buffer) {
+	Utils::Output(Utils::StringFormat(L"CDemoService::ProcessCommand pipe: %p, buffer: %p", pipe, buffer));
 	const BYTE * data = buffer->GetBuffer();
 	Utils::Protocol::CmdHeader ch = {0};
 	memcpy(&ch, data, Utils::Protocol::Commond::CmdHeaderLen);

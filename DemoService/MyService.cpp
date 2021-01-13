@@ -23,7 +23,8 @@ void MyService::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::L
 
 	wcscpy_s(response->UserName, request->UserName);
 	wcscpy_s(response->Password, request->Password);
-	response->Result = true;
+	static WORD testResult = Utils::Protocol::LoginResponse::Unknown;
+	response->Result = testResult++ % 6;
 
 	Utils::Output(Utils::StringFormat(L"会话[%u]授权成功", request->SessionID));
 	if (last_auth_user_.UserName.empty()) {

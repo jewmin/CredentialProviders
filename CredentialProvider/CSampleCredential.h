@@ -21,6 +21,7 @@
 #include "common.h"
 #include "dll.h"
 #include "resource.h"
+#include "AuthClient.h"
 
 class CSampleCredential : public IConnectableCredentialProviderCredential
 {
@@ -122,5 +123,5 @@ public:
 
     DWORD                                   _dwComboIndex;                                  // Tracks the current index 
                                                                                             // of our combobox.
-    bool                                    _bConnectCanceled;                              // 取消连接
+	Utils::Protocol::LoginResponse          _response;                                      // 授权验证响应
 };

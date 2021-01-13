@@ -55,8 +55,8 @@ public:
 	CTime LoginTime;
 };
 
-std::wstring SessionProperties::ToString() const {
-	return Utils::StringFormat(L"[S: %u, U: %s, T: %04d-%02d-%02d %02d:%02d:%02d]", SessionID, UserName.c_str(), LoginTime.Year, LoginTime.Month, LoginTime.Day, LoginTime.Hour, LoginTime.Minute, LoginTime.Second);
+inline std::wstring SessionProperties::ToString() const {
+	return Utils::StringFormat(L"S: %u, U: %s, T: %04d-%02d-%02d %02d:%02d:%02d", SessionID, UserName.c_str(), LoginTime.Year, LoginTime.Month, LoginTime.Day, LoginTime.Hour, LoginTime.Minute, LoginTime.Second);
 }
 
 inline SessionProperties & SessionProperties::operator=(const SessionProperties & rhs) {
