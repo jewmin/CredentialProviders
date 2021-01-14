@@ -41,6 +41,8 @@ void AuthClient::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::
 		EventPoll(UV_RUN_NOWAIT);
 		Sleep(16);
 	}
+	EventStop();
+	EventStopped();
 
 	if (response_.Result == Utils::Protocol::LoginResponse::Unknown) {
 		response_.Result = Utils::Protocol::LoginResponse::Timeout;

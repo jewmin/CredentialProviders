@@ -26,16 +26,21 @@ void MyService::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::L
 	static WORD testResult = Utils::Protocol::LoginResponse::Unknown;
 	response->Result = testResult++ % 6;
 
-	Utils::Output(Utils::StringFormat(L"会话[%u]授权成功", request->SessionID));
-	if (last_auth_user_.UserName.empty()) {
-		Utils::Output(Utils::StringFormat(L"新用户[%s]", request->UserName));
-	} else if (last_auth_user_.UserName != request->UserName) {
-		Utils::Output(Utils::StringFormat(L"切换用户[%s] -> [%s]", last_auth_user_.UserName.c_str(), request->UserName));
+	if (response->Result == Utils::Protocol::LoginResponse::AuthSuccess) {
+		Utils::Output(Utils::StringFormat(L"会话[%u]授权成功", request->SessionID));
+		if (last_auth_user_.UserName.empty()) {
+			Utils::Output(Utils::StringFormat(L"新用户[%s]", request->UserName));
+		}
+		else if (last_auth_user_.UserName != request->UserName) {
+			Utils::Output(Utils::StringFormat(L"切换用户[%s] -> [%s]", last_auth_user_.UserName.c_str(), request->UserName));
+		}
+		last_auth_user_.SessionID = request->SessionID;
+		last_auth_user_.UserName = request->UserName;
+		last_auth_user_.Password = request->Password;
+		last_auth_user_.LoginTime.Now();
+	} else {
+		Utils::Output(Utils::StringFormat(L"会话[%u]授权失败", request->SessionID));
 	}
-	last_auth_user_.SessionID = request->SessionID;
-	last_auth_user_.UserName = request->UserName;
-	last_auth_user_.Password = request->Password;
-	last_auth_user_.LoginTime.Now();
 }
 
 void MyService::OnLogon(DWORD SessionID) {
