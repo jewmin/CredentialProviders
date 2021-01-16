@@ -1,0 +1,21 @@
+EXPORTS
+    WlxNegotiate                        PRIVATE
+    WlxInitialize                       PRIVATE
+    WlxDisplaySASNotice                 PRIVATE
+    WlxLoggedOutSAS                     PRIVATE
+    WlxActivateUserShell                PRIVATE
+    WlxLoggedOnSAS                      PRIVATE
+    WlxDisplayLockedNotice              PRIVATE
+    WlxWkstaLockedSAS                   PRIVATE
+    WlxIsLockOk                         PRIVATE
+    WlxIsLogoffOk                       PRIVATE
+    WlxLogoff                           PRIVATE
+    WlxShutdown                         PRIVATE
+    WlxNetworkProviderLoad              PRIVATE
+    WlxDisplayStatusMessage             PRIVATE
+    WlxGetStatusMessage                 PRIVATE
+    WlxRemoveStatusMessage              PRIVATE
+    WlxGetConsoleSwitchCredentials      PRIVATE
+    WlxReconnectNotify                  PRIVATE
+    WlxDisconnectNotify                 PRIVATE
+    DebugGINA                           PRIVATE
