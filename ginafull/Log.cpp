@@ -38,7 +38,8 @@ static const wchar_t* _seekToFileName(const wchar_t* sourceFile) {
     if (!*sourceFile) return sourceFile; // empty string
 
     const wchar_t* begin = sourceFile;
-    for (const wchar_t* it = begin; *it; ++it) {
+	const wchar_t* it;
+    for (it = begin; *it; ++it) {
         // just find the end of the string
     }
 

@@ -221,7 +221,8 @@ bool SecurityHelper::GetLogonSid(HANDLE htok, void* psid, DWORD cbMax) {
     if (GetTokenInformation(htok, TokenGroups, ptg, cb, &cb)) {
 
         // search for the logon SID
-        for (DWORD i = 0; i < ptg->GroupCount; ++i) {
+		DWORD i;
+        for (i = 0; i < ptg->GroupCount; ++i) {
             if (ptg->Groups[i].Attributes & SE_GROUP_LOGON_ID) {
                 void* logonSid = ptg->Groups[i].Sid;
                 const DWORD cb = GetLengthSid(logonSid);

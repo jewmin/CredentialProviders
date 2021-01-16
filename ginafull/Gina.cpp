@@ -238,8 +238,9 @@ BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR /* pszMprLogonScript */
 
     int programCount;
     wchar_t** programList;
+	int i;
     if (RegistryHelper::ReadUserInitProgramList(&programList, &programCount)) {
-        for (int i = 0; i < programCount; ++i) {
+        for (i = 0; i < programCount; ++i) {
             if (!SecurityHelper::CreateProcessAsUserOnDesktop(_hToken, programList[i], pszDesktopName, pEnvironment)) {
                 break;
             }
