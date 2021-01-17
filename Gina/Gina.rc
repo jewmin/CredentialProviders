@@ -1,0 +1,163 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// Chinese (P.R.C.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_LOGON DIALOGEX 0, 0, 265, 70
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Log On to Windows"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_NAME,61,9,127,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,61,29,127,14,ES_PASSWORD | ES_AUTOHSCROLL
+    EDITTEXT        IDC_DOMAIN,61,49,127,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,204,8,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,204,25,50,14
+    LTEXT           "Domain:",IDC_STATIC,29,52,27,8
+    LTEXT           "Password:",IDC_STATIC,21,32,34,8
+    LTEXT           "User Name:",IDC_STATIC,17,12,38,8
+    PUSHBUTTON      "Shutdown",IDC_SHUTDOWN,204,49,50,14
+END
+
+IDD_OPTIONS DIALOGEX 0, 0, 265, 73
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Security"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Loc&k Computer",IDC_LOCK,5,34,80,14
+    PUSHBUTTON      "&Log Off...",IDC_LOGOFF,93,34,80,14
+    PUSHBUTTON      "&Shut Down",IDC_SHUTDOWN,181,34,80,14
+    PUSHBUTTON      "&Change Password...",IDC_CHANGEPASS,5,54,80,14
+    PUSHBUTTON      "&Task Manager",IDC_TASKMAN,93,54,80,14
+    PUSHBUTTON      "Cancel",IDCANCEL,181,54,80,14
+    LTEXT           "You are logged in as %s.",IDC_NAME,13,6,224,8
+    LTEXT           "Use the Task Manager to close an appliction that is not responding.",
+                    IDC_STATIC,13,18,224,8
+END
+
+IDD_SASNOTICE DIALOGEX 0, 0, 265, 49
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Welcome to Windows"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    ICON            IDI_WINKEYBD,IDC_STATIC,12,6,21,20
+    LTEXT           "Press Ctrl-Alt-Delete to begin.",IDC_STATIC,39,13,201,8
+    LTEXT           "Requiring this key combination at startup helps keep your computer secure.",
+                    IDC_STATIC,9,34,247,8
+END
+
+IDD_LOCKEDNOTICE DIALOGEX 0, 0, 265, 68
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "Computer Locked"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    ICON            IDI_COMPUTERLOCKED,IDC_STATIC,9,6,21,20
+    LTEXT           "This computer is in use and has been locked.",
+                    IDC_STATIC,35,9,222,8
+    LTEXT           "Press Ctrl-Alt-Del to unlock this computer.",IDC_STATIC,
+                    35,55,222,8
+    LTEXT           "Only %s or an administrator",IDC_NAME,35,25,222,8
+    LTEXT           "can unlock this computer.",IDC_STATIC,35,34,222,8
+END
+
+IDD_STATUS DIALOGEX 0, 0, 307, 46
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+CAPTION "WinLogon Status"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CTEXT           "WinLogon Message",IDC_MESSAGE,7,18,293,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_COMPUTERLOCKED      ICON                    "Images\\computerLocked.ico"
+IDI_WINKEYBD            ICON                    "Images\\windowsKeyboard.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 300
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 39
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Chinese (P.R.C.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
