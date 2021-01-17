@@ -1,6 +1,8 @@
+#include <WinSock2.h>
 #include <Windows.h>
 #include <WinWlx.h>
 #include "Utils.h"
+#include "Gina.h"
 
 // The WlxNegotiate function must be implemented by a replacement GINA DLL.
 // This is the first call made by Winlogon to the GINA DLL.
@@ -12,7 +14,8 @@ WlxNegotiate(
     PDWORD                  pdwDllVersion
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxNegotiate dwWinlogonVersion: %u", dwWinlogonVersion));
+    return Gina::Negotiate(dwWinlogonVersion, pdwDllVersion);
 }
 
 // Winlogon calls this function once for each window station present on the computer.
@@ -27,7 +30,8 @@ WlxInitialize(
     PVOID *                 pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxInitialize lpWinsta: %s, hWlx: %p, pWinlogonFunctions: %p", lpWinsta, hWlx, pWinlogonFunctions));
+    return Gina::Initialize(hWlx, pWinlogonFunctions, reinterpret_cast<Gina * *>(pWlxContext));
 }
 
 // Winlogon calls this function when no user is logged on.
@@ -37,7 +41,8 @@ WlxDisplaySASNotice(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxDisplaySASNotice pWlxContext: %p", pWlxContext));
+    static_cast<Gina *>(pWlxContext)->DisplaySASNotice();
 }
 
 // Winlogon calls this function when it receives a secure attention sequence (SAS) event while no user is logged on.
@@ -54,7 +59,8 @@ WlxLoggedOutSAS(
     PVOID *                 pProfile
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, dwSasType: %u", pWlxContext, dwSasType));
+    return static_cast<Gina *>(pWlxContext)->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pNprNotifyInfo, pProfile);
 }
 
 // Activates the user shell program.
@@ -67,7 +73,8 @@ WlxActivateUserShell(
     PVOID                   pEnvironment
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxActivateUserShell pWlxContext: %p, pszDesktopName: %s", pWlxContext, pszDesktopName));
+    return static_cast<Gina *>(pWlxContext)->ActivateUserShell(pszDesktopName, pszMprLogonScript, pEnvironment);
 }
 
 // Winlogon calls this function when it receives a secure attention sequence (SAS) event while the user is logged on and the workstation is not locked.
@@ -79,7 +86,8 @@ WlxLoggedOnSAS(
     PVOID                   pReserved
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, dwSasType: %u", pWlxContext, dwSasType));
+    return static_cast<Gina *>(pWlxContext)->LoggedOnSAS(dwSasType);
 }
 
 // Allows the GINA to display information about the lock, such as who locked the workstation and when it was locked.
@@ -89,7 +97,8 @@ WlxDisplayLockedNotice(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxDisplayLockedNotice pWlxContext: %p", pWlxContext));
+    static_cast<Gina *>(pWlxContext)->DisplayLockedNotice();
 }
 
 // Winlogon calls this function when it receives a secure attention sequence (SAS) and the workstation is locked.
@@ -100,7 +109,8 @@ WlxWkstaLockedSAS(
     DWORD                   dwSasType
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, dwSasType: %u", pWlxContext, dwSasType));
+    return static_cast<Gina *>(pWlxContext)->WkstaLockedSAS(dwSasType);
 }
 
 // Winlogon calls this function before attempting to lock the workstation.
@@ -110,7 +120,8 @@ WlxIsLockOk(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxIsLockOk pWlxContext: %p", pWlxContext));
+    return static_cast<Gina *>(pWlxContext)->IsLockOk();
 }
 
 // Winlogon calls this function when the user initiates a logoff operation.
@@ -120,7 +131,8 @@ WlxIsLogoffOk(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxIsLogoffOk pWlxContext: %p", pWlxContext));
+    return static_cast<Gina *>(pWlxContext)->IsLogoffOk();
 }
 
 // Winlogon calls this function to notify the GINA of a logoff operation on this workstation, allowing the GINA to perform any logoff operations that may be required.
@@ -130,7 +142,8 @@ WlxLogoff(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxLogoff pWlxContext: %p", pWlxContext));
+    static_cast<Gina *>(pWlxContext)->Logoff();
 }
 
 // Winlogon calls this function just before shutting down, allowing the GINA to perform any shutdown tasks, such as ejecting a smart card from a reader.
@@ -141,7 +154,8 @@ WlxShutdown(
     DWORD                   ShutdownType
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxShutdown pWlxContext: %p, ShutdownType: %u", pWlxContext, ShutdownType));
+    static_cast<Gina *>(pWlxContext)->Shutdown(ShutdownType);
 }
 
 
@@ -156,7 +170,8 @@ WlxScreenSaverNotify(
     PVOID                   pWlxContext,
     BOOL *                  pSecure)
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxScreenSaverNotify pWlxContext: %p", pWlxContext));
+    return static_cast<Gina *>(pWlxContext)->ScreenSaverNotify(pSecure);
 }
 
 // Winlogon calls this function when the system needs an application to be started in the context of the user.
@@ -169,7 +184,8 @@ WlxStartApplication(
     PWSTR                   pszCmdLine
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxStartApplication pWlxContext: %p, pszDesktopName: %s", pWlxContext, pszDesktopName));
+    return static_cast<Gina *>(pWlxContext)->StartApplication(pszDesktopName, pEnvironment, pszCmdLine);
 }
 
 //
@@ -184,7 +200,8 @@ WlxNetworkProviderLoad(
     PWLX_MPR_NOTIFY_INFO    pNprNotifyInfo
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxNetworkProviderLoad pWlxContext: %p, pNprNotifyInfo: %p", pWlxContext, pNprNotifyInfo));
+    return static_cast<Gina *>(pWlxContext)->NetworkProviderLoad(pNprNotifyInfo);
 }
 
 // Winlogon calls this function when the GINA DLL should display a message.
@@ -198,7 +215,8 @@ WlxDisplayStatusMessage(
     PWSTR                   pMessage
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxDisplayStatusMessage pWlxContext: %p, pTitle: %s, pMessage: %s", pWlxContext, pTitle, pMessage));
+    return static_cast<Gina *>(pWlxContext)->DisplayStatusMessage(hDesktop, dwOptions, pTitle, pMessage);
 }
 
 // Winlogon calls this function to get the status message being displayed by the GINA DLL.
@@ -211,7 +229,8 @@ WlxGetStatusMessage(
     DWORD                   dwBufferSize
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxGetStatusMessage pWlxContext: %p, pMessage: %s", pWlxContext, pMessage));
+    return static_cast<Gina *>(pWlxContext)->GetStatusMessage(pdwOptions, pMessage, dwBufferSize);
 }
 
 // Winlogon calls this function to tell the GINA DLL to stop displaying the status message.
@@ -221,7 +240,8 @@ WlxRemoveStatusMessage(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxRemoveStatusMessage pWlxContext: %p", pWlxContext));
+    return static_cast<Gina *>(pWlxContext)->RemoveStatusMessage();
 }
 
 //
@@ -231,30 +251,33 @@ WlxRemoveStatusMessage(
 // Winlogon calls this function to read the currently logged on user's credentials to transparently transfer them to a target session.
 BOOL
 WINAPI
-WlxGetConsoleSwitchCredentials (
+WlxGetConsoleSwitchCredentials(
     PVOID                   pWlxContext,
     PVOID                   pCredInfo
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxGetConsoleSwitchCredentials pWlxContext: %p, pCredInfo: %p", pWlxContext, pCredInfo));
+    return static_cast<Gina *>(pWlxContext)->GetConsoleSwitchCredentials(static_cast<PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0>(pCredInfo));
 }
 
 // Winlogon calls this function when a Terminal Services network session is reconnected.
 VOID
 WINAPI
-WlxReconnectNotify (
+WlxReconnectNotify(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxReconnectNotify pWlxContext: %p", pWlxContext));
+    static_cast<Gina *>(pWlxContext)->ReconnectNotify();
 }
 
 // Winlogon calls this function when a Terminal Services network session is disconnected.
 VOID
 WINAPI
-WlxDisconnectNotify (
+WlxDisconnectNotify(
     PVOID                   pWlxContext
     )
 {
-
+    Utils::Output(Utils::StringFormat(L"WlxDisconnectNotify pWlxContext: %p", pWlxContext));
+    static_cast<Gina *>(pWlxContext)->DisconnectNotify();
 }

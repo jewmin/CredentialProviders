@@ -1,4 +1,5 @@
 #include "MockWinlogon.h"
+
 MockWinlogon::MockWinlogon() {
 }
 

@@ -2,6 +2,9 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gina", "Gina\Gina.vcproj", "{1FBDA398-58DD-4BF0-846B-B0DEEBA62120}"
+	ProjectSection(ProjectDependencies) = postProject
+		{89182927-777E-4301-AAFE-B731FE6D9BA9} = {89182927-777E-4301-AAFE-B731FE6D9BA9}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utils", "Utils\Utils.vcproj", "{89182927-777E-4301-AAFE-B731FE6D9BA9}"
 EndProject
