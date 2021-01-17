@@ -41,8 +41,8 @@ private:
     Gina(IWinlogon * pWinlogon, HANDLE LsaHandle);
 
 private:
-    IWinlogon * pWinlogon_;
-    HANDLE LsaHandle_;                                  // Pointer that receives a handle used in future authentication function calls.
-    HANDLE UserToken_;                                  // Handle of the users token.
-    PWSTR ProfilePath_;                                 // UNICODE_STRING specifying the path to the user's roaming profile if the user has a roaming profile. For example: \SomeServer\SomeShare\MyUserName
+    IWinlogon *             pWinlogon_;
+    HANDLE                  LsaHandle_;             // Pointer that receives a handle used in future authentication function calls.
+    HANDLE                  UserToken_;             // Handle of the users token.
+    PWSTR                   ProfilePath_;           // UNICODE_STRING specifying the path to the user's roaming profile if the user has a roaming profile. For example: \SomeServer\SomeShare\MyUserName
 };

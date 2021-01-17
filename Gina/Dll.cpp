@@ -6,6 +6,8 @@
 static HINSTANCE g_hinst = NULL;
 static Utils::CFileLog g_log;
 
+HINSTANCE GetInstance() { return g_hinst; }
+
 BOOL WINAPI DllMain(__in HINSTANCE hinstDll, __in DWORD dwReason, __in void *)
 {
     switch (dwReason)
