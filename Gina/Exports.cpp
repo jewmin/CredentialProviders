@@ -1,8 +1,23 @@
 #include <WinSock2.h>
 #include <Windows.h>
 #include <WinWlx.h>
-#include "Utils.h"
 #include "Gina.h"
+
+static const PWSTR s_WST_Strings[] =
+{
+    L"WLX_SAS_TYPE_TIMEOUT",
+    L"WLX_SAS_TYPE_CTRL_ALT_DEL",
+    L"WLX_SAS_TYPE_SCRNSVR_TIMEOUT",
+    L"WLX_SAS_TYPE_SCRNSVR_ACTIVITY",
+    L"WLX_SAS_TYPE_USER_LOGOFF",
+    L"WLX_SAS_TYPE_SC_INSERT",
+    L"WLX_SAS_TYPE_SC_REMOVE",
+    L"WLX_SAS_TYPE_AUTHENTICATED",
+    L"WLX_SAS_TYPE_SC_FIRST_READER_ARRIVED",
+    L"WLX_SAS_TYPE_SC_LAST_READER_REMOVED",
+    L"WLX_SAS_TYPE_SWITCHUSER",
+    L"WLX_SAS_TYPE_MAX_MSFT_VALUE",
+};
 
 // The WlxNegotiate function must be implemented by a replacement GINA DLL.
 // This is the first call made by Winlogon to the GINA DLL.
@@ -59,7 +74,7 @@ WlxLoggedOutSAS(
     PVOID *                 pProfile
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, dwSasType: %u", pWlxContext, dwSasType));
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
     return static_cast<Gina *>(pWlxContext)->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pNprNotifyInfo, pProfile);
 }
 
@@ -86,7 +101,7 @@ WlxLoggedOnSAS(
     PVOID                   pReserved
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, dwSasType: %u", pWlxContext, dwSasType));
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
     return static_cast<Gina *>(pWlxContext)->LoggedOnSAS(dwSasType);
 }
 
@@ -109,7 +124,7 @@ WlxWkstaLockedSAS(
     DWORD                   dwSasType
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, dwSasType: %u", pWlxContext, dwSasType));
+    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
     return static_cast<Gina *>(pWlxContext)->WkstaLockedSAS(dwSasType);
 }
 

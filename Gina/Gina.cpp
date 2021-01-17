@@ -1,6 +1,7 @@
 #include "Gina.h"
 #include "MockWinlogon.h"
 #include "RealWinlogon.h"
+#include "SecurityHelper.h"
 
 BOOL Gina::Negotiate(DWORD dwWinlogonVersion, PDWORD pdwDllVersion) {
     if (dwWinlogonVersion < WLX_VERSION_1_3) {
@@ -23,14 +24,27 @@ BOOL Gina::Initialize(HANDLE hWlx, PVOID pWinlogonFunctions, Gina * * ppGina) {
     }
 
     HANDLE LsaHandle;
+    if (!SecurityHelper::RegisterLogonProcess(&LsaHandle)) {
+        return FALSE;
+    }
+
     *ppGina = new Gina(pWinlogon, LsaHandle);
     return TRUE;
 }
 
 Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     : pWinlogon_(pWinlogon)
-    , LsaHandle_(LsaHandle) {
+    , LsaHandle_(LsaHandle)
+    , UserToken_(NULL)
+    , ProfilePath_(NULL) {
+    // 告诉Winlogon我们使用Ctrl-Alt-Del
+    ULONG_PTR OldValue;
+    pWinlogon_->WlxSetOption(WLX_OPTION_USE_CTRL_ALT_DEL, TRUE, &OldValue);
 
+    // 远程登录用户输入模拟Ctrl-Alt-Del
+    if (0 != GetSystemMetrics(SM_REMOTESESSION)) {
+        pWinlogon_->WlxSasNotify(WLX_SAS_TYPE_CTRL_ALT_DEL);
+    }
 }
 
 int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * pProfile) {
@@ -102,9 +116,7 @@ BOOL Gina::GetConsoleSwitchCredentials(PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 
 }
 
 VOID Gina::ReconnectNotify() {
-
 }
 
 VOID Gina::DisconnectNotify() {
-
 }

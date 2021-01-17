@@ -61,7 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Utils.lib Secur32.lib"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;$(OutDir)\&quot;"
 				ModuleDefinitionFile="Gina.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -135,7 +137,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="Utils.lib Secur32.lib"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(OutDir)\&quot;"
 				ModuleDefinitionFile="Gina.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -198,6 +202,10 @@
 				RelativePath=".\RealWinlogon.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\SecurityHelper.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -218,6 +226,10 @@
 			</File>
 			<File
 				RelativePath=".\RealWinlogon.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SecurityHelper.h"
 				>
 			</File>
 		</Filter>

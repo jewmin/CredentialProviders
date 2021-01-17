@@ -1,6 +1,7 @@
 #pragma once
 
 #include "IWinlogon.h"
+#include "Utils.h"
 
 class Gina {
 public:
