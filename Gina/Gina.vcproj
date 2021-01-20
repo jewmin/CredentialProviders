@@ -217,6 +217,14 @@
 					RelativePath=".\UI\GuiHelper.cpp"
 					>
 				</File>
+				<File
+					RelativePath=".\UI\NoticeDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\UI\StatusDialog.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -224,6 +232,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\afxres.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Gina.h"
 				>
@@ -248,6 +260,10 @@
 				RelativePath=".\SecurityHelper.h"
 				>
 			</File>
+			<File
+				RelativePath=".\winres.h"
+				>
+			</File>
 			<Filter
 				Name="UI"
 				>
@@ -257,6 +273,14 @@
 				</File>
 				<File
 					RelativePath=".\UI\GuiHelper.h"
+					>
+				</File>
+				<File
+					RelativePath=".\UI\NoticeDialog.h"
+					>
+				</File>
+				<File
+					RelativePath=".\UI\StatusDialog.h"
 					>
 				</File>
 			</Filter>

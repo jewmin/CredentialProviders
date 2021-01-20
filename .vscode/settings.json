@@ -3,6 +3,7 @@
 	"editor.tabSize": 4,
 	"editor.insertSpaces": true,
 	"files.eol": "\r\n",
+	"editor.renderWhitespace": "all",
 	"files.associations": {
 		"xstring": "cpp",
 		"ostream": "cpp",

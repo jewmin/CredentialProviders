@@ -21,23 +21,23 @@ int MockWinlogon::WlxAssignShellProtection(HANDLE hToken, HANDLE hProcess, HANDL
 }
 
 int MockWinlogon::WlxMessageBox(HWND hwndOwner, LPWSTR lpszText, LPWSTR lpszTitle, UINT fuStyle) {
-    return MessageBox(hwndOwner, lpszText, lpszTitle, fuStyle);
+    return ::MessageBox(hwndOwner, lpszText, lpszTitle, fuStyle);
 }
 
 int MockWinlogon::WlxDialogBox(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc) {
-    return DialogBox(static_cast<HINSTANCE>(hInst), lpszTemplate, hwndOwner, dlgprc);
+    return ::DialogBox(static_cast<HINSTANCE>(hInst), lpszTemplate, hwndOwner, dlgprc);
 }
 
 int MockWinlogon::WlxDialogBoxParam(HANDLE hInst, LPWSTR lpszTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam) {
-    return DialogBoxParam(static_cast<HINSTANCE>(hInst), lpszTemplate, hwndOwner, dlgprc, dwInitParam);
+    return ::DialogBoxParam(static_cast<HINSTANCE>(hInst), lpszTemplate, hwndOwner, dlgprc, dwInitParam);
 }
 
 int MockWinlogon::WlxDialogBoxIndirect(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc) {
-    return DialogBoxIndirect(static_cast<HINSTANCE>(hInst), hDialogTemplate, hwndOwner, dlgprc);
+    return ::DialogBoxIndirect(static_cast<HINSTANCE>(hInst), hDialogTemplate, hwndOwner, dlgprc);
 }
 
 int MockWinlogon::WlxDialogBoxIndirectParam(HANDLE hInst, LPCDLGTEMPLATE hDialogTemplate, HWND hwndOwner, DLGPROC dlgprc, LPARAM dwInitParam) {
-    return DialogBoxIndirectParam(static_cast<HINSTANCE>(hInst), hDialogTemplate, hwndOwner, dlgprc, dwInitParam);
+    return ::DialogBoxIndirectParam(static_cast<HINSTANCE>(hInst), hDialogTemplate, hwndOwner, dlgprc, dwInitParam);
 }
 
 int MockWinlogon::WlxSwitchDesktopToUser() {

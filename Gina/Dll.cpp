@@ -13,6 +13,7 @@ BOOL WINAPI DllMain(__in HINSTANCE hinstDll, __in DWORD dwReason, __in void *)
     switch (dwReason)
     {
     case DLL_PROCESS_ATTACH:
+        g_log.SetLogFileNameFormat(L"Gina_%02d%02d%02d.log");
         Utils::SetLog(&g_log);
         DisableThreadLibraryCalls(hinstDll);
         break;

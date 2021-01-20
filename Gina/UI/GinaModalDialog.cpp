@@ -7,6 +7,9 @@ GinaModalDialog::GinaModalDialog(IWinlogon * pWinlogon, int nDialogResourceID, H
     , hWnd_(NULL) {
 }
 
+GinaModalDialog::~GinaModalDialog() {
+}
+
 int GinaModalDialog::Show() {
     return pWinlogon_->WlxDialogBoxParam(hInst_, MAKEINTRESOURCE(nDialogResourceID_), 0, GinaModalDialog::DlgProc, reinterpret_cast<LPARAM>(this));
 }
