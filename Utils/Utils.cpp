@@ -47,7 +47,10 @@ std::wstring StringFormatVa(const wchar_t * format, va_list args) {
 }
 
 std::wstring GetLastErrorString() {
-	DWORD error_code = ::GetLastError();
+	return GetErrorString(::GetLastError());
+}
+
+std::wstring GetErrorString(DWORD error_code) {
 	LPVOID lpBuffer = NULL;
 	if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM, NULL, error_code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&lpBuffer, 0, NULL)) {
 		std::wstring result = StringFormat(L"%u %s", error_code, lpBuffer);

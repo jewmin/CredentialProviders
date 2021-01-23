@@ -6,6 +6,9 @@
 #include "UI/SecurityOptionsDialog.h"
 #include "UI/LogonDialog.h"
 
+// length of a Windows logon SID of the form S-1-5-5-x-y
+#define LOGON_SID_SIZE 20
+
 BOOL Gina::Negotiate(DWORD dwWinlogonVersion, PDWORD pdwDllVersion) {
     if (dwWinlogonVersion < WLX_VERSION_1_3) {
         return FALSE;
@@ -61,9 +64,14 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     }
 }
 
-int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * pProfile) {
+int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * ppWinlogonProfile) {
     *pdwOptions = 0; // 由Winlogon加载用户配置
     ZeroMemory(pNprNotifyInfo, sizeof(*pNprNotifyInfo));
+
+    wchar_t *       profilePath = NULL;
+    const wchar_t * domain      = NULL;
+    const wchar_t * username    = NULL;
+    const wchar_t * password    = NULL;
 
     if (WLX_SAS_TYPE_CTRL_ALT_DEL == dwSasType) {
         // 登录对话框，获取域名、用户名、密码
@@ -72,11 +80,99 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
             return WLX_SAS_ACTION_NONE;
         }
 
+        // attempt the login
+        DWORD win32Error;
         MSV1_0_INTERACTIVE_PROFILE * pProfile = NULL;
-        
+        if (!SecurityHelper::CallLsaLogonUser(hLsaHandle_, dlg.domain_, dlg.username_, dlg.password_, Interactive, pAuthenticationId, phToken, &pProfile, &win32Error)) {
+            // NOTE: a full implementation would deal with expired / must change passwords here
+            // by reading the statistics in the profile and giving the user a chance to
+            // change her password if it's expired or about to expire
+
+            // message the user to let her know why the logon failed
+            std::wstring msg = Utils::GetErrorString(win32Error);
+            pWinlogon_->WlxMessageBox(NULL, const_cast<LPWSTR>(msg.c_str()), L"Logon Message", MB_ICONEXCLAMATION);
+            return WLX_SAS_ACTION_NONE;
+        }
+
+        if (!SecurityHelper::ExtractProfilePath(&profilePath, pProfile)) {
+            return WLX_SAS_ACTION_NONE;
+        }
+        ::LsaFreeReturnBuffer(pProfile);
+
+        domain   = dlg.domain_;
+        username = dlg.username_;
+        password = dlg.password_;
+    } else if (WLX_SAS_TYPE_AUTHENTICATED == dwSasType) {
+        // use the information in the other TS session to auto-logon this session
+        WLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 credInfo;
+        ZeroMemory(&credInfo, sizeof(credInfo));
+        credInfo.dwType = WLX_CONSOLESWITCHCREDENTIAL_TYPE_V1_0;
+
+        Utils::Output(L"Gina::LoggedOutSAS - Calling WlxQueryConsoleSwitchCredentials");
+        if (pWinlogon_->WlxQueryConsoleSwitchCredentials(&credInfo)) {
+            Utils::Output(L"Gina::LoggedOutSAS - WlxQueryConsoleSwitchCredentials Successfully");
+
+            *phToken = credInfo.UserToken;
+            profilePath = credInfo.ProfilePath;
+            Utils::Output(Utils::StringFormat(L"Gina::LoggedOutSAS - Profile Path: %s", profilePath ? profilePath : L"<null>"));
+
+            if (!SecurityHelper::GetLogonSessionId(credInfo.UserToken, pAuthenticationId)) {
+                // this should never fail, just a sanity check
+                return WLX_SAS_ACTION_NONE;
+            }
+
+            // I believe the profile is already loaded in this case;
+            // if you don't specify this option, WinLogon will fail and the error log will
+            // complain that the profile failed to be loaded
+            *pdwOptions = WLX_LOGON_OPT_NO_PROFILE;
+        } else {
+            Utils::Output(L"Gina::LoggedOutSAS - WlxQueryConsoleSwitchCredentials Error");
+            return WLX_SAS_ACTION_NONE;
+        }
+    } else {
+        Utils::Output(L"Gina::LoggedOutSAS - WARNING: Unrecognized SASType");
+        return WLX_SAS_ACTION_NONE;
     }
 
-    return 0;
+    // if we get this far, the login succeeded, but there are a few minor things that could still fail
+    int action = WLX_SAS_ACTION_NONE;
+    bool success = false;
+
+    // cache the profilePath in case we need to transfer it to another TS session
+    ::LocalFree(pszProfilePath_);
+    pszProfilePath_ = profilePath;
+
+    // Assume that WinLogon provides a buffer large enough to hold a logon SID,
+    // which is of fixed length. It'd be nice if WinLogon would tell us how big
+    // its buffer actually was, but it appears this is assumed.
+    if (SecurityHelper::GetLogonSid(*phToken, pLogonSid, LOGON_SID_SIZE)) {
+        if (SecurityHelper::AllocWinLogonProfile((WLX_PROFILE_V1_0 * *)ppWinlogonProfile, profilePath)) {
+            if (WLX_SAS_TYPE_AUTHENTICATED == dwSasType) {
+                success = true;
+                action = WLX_SAS_ACTION_LOGON;
+            } else {
+                // copy login information for network providers
+                pNprNotifyInfo->pszDomain   = SecurityHelper::LocalAllocString(domain);
+                pNprNotifyInfo->pszUserName = SecurityHelper::LocalAllocString(username);
+                pNprNotifyInfo->pszPassword = SecurityHelper::LocalAllocString(password);
+
+                if (pNprNotifyInfo->pszUserName && pNprNotifyInfo->pszDomain && pNprNotifyInfo->pszPassword) {
+                    success = true;
+                    action = WLX_SAS_ACTION_LOGON;
+                }
+            }
+        }
+    }
+
+    if (success) {
+        // GINA caches a copy of the interactive user's token
+        hUserToken_ = *phToken;
+    } else {
+        ::CloseHandle(*phToken);
+        *phToken = NULL;
+    }
+
+    return action;
 }
 
 int Gina::LoggedOnSAS(DWORD dwSasType) {
@@ -109,12 +205,69 @@ int Gina::LoggedOnSAS(DWORD dwSasType) {
 }
 
 int Gina::WkstaLockedSAS(DWORD dwSasType) {
-    // TODO
-    return 0;
+    // we only support Control-Alt-Delete secure attention sequence (SAS)
+    if (WLX_SAS_TYPE_CTRL_ALT_DEL != dwSasType) {
+        return WLX_SAS_ACTION_NONE;
+    }
+
+    int result = WLX_SAS_ACTION_NONE;
+
+    if (WLX_SAS_TYPE_CTRL_ALT_DEL == dwSasType) {
+        // an optimization you might want to make here would be to cache
+        // the user name and domain so the user doesn't have to retype it here
+        LogonDialog dlg(pWinlogon_);
+
+        // collect credentials from user
+        if (IDOK == dlg.Show()) {
+            // attempt the login
+            DWORD win32Error;
+            HANDLE hUnlockToken;
+            if (SecurityHelper::CallLsaLogonUser(hLsaHandle_, dlg.domain_, dlg.username_, dlg.password_, Unlock, 0, &hUnlockToken, 0, &win32Error)) {
+                bool isSameUser;
+                if (SecurityHelper::IsSameUser(hUnlockToken, hUserToken_, &isSameUser) && isSameUser) {
+                    // user has returned to unlock her workstation
+                    result = WLX_SAS_ACTION_UNLOCK_WKSTA;
+                } else if (SecurityHelper::IsAdmin(hUnlockToken)) {
+                    // admin trying to forcefully unlock the workstation
+                    if (IDYES == pWinlogon_->WlxMessageBox(NULL, L"Forcefully log off the current user? He/she may lose work!", L"Log Off Windows", MB_ICONHAND | MB_YESNO | MB_DEFBUTTON2)) {
+                        result = WLX_SAS_ACTION_FORCE_LOGOFF;
+                    }
+                } else {
+                    // some non-admin is trying to break into this workstation
+                    // tell them to get lost
+                    pWinlogon_->WlxMessageBox(NULL, L"You do not have permission to force this user to log off.", L"Security", MB_ICONSTOP);
+                }
+                ::CloseHandle(hUnlockToken);
+            } else {
+                // message the user to let her know why the logon failed
+                std::wstring msg = Utils::GetErrorString(win32Error);
+                pWinlogon_->WlxMessageBox(NULL, const_cast<LPWSTR>(msg.c_str()), L"Logon Message", MB_ICONEXCLAMATION);
+            }
+        }
+    }
+
+    return result;
 }
 
 BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOID pEnvironment) {
-    // TODO
+    int programCount;
+    wchar_t * * programList;
+	int i;
+    if (SecurityHelper::ReadUserInitProgramList(&programList, &programCount)) {
+        for (i = 0; i < programCount; ++i) {
+            if (!SecurityHelper::CreateProcessAsUserOnDesktop(hUserToken_, programList[i], pszDesktopName, pEnvironment)) {
+                break;
+            }
+        }
+
+        SecurityHelper::FreeUserInitProgramList(programList, programCount);
+
+        // GINA is required to release the environment block
+        ::VirtualFree(pEnvironment, 0, MEM_RELEASE);
+
+        return i == programCount; // if we launched all the Userinit programs, we succeeded
+    }
+
     return FALSE;
 }
 

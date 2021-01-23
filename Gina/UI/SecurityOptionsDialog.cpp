@@ -1,5 +1,5 @@
 #include "SecurityOptionsDialog.h"
-#include "SecurityHelper.h"
+#include "../SecurityHelper.h"
 
 SecurityOptionsDialog::SecurityOptionsDialog(IWinlogon * pWinlogon, HANDLE hUserToken)
     : GinaModalDialog(pWinlogon, IDD_OPTIONS)

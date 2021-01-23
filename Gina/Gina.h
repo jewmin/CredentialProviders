@@ -10,7 +10,7 @@ public:
     static BOOL Initialize(HANDLE hWlx, PVOID pWinlogonFunctions, Gina * * ppGina);
 
 public:
-    int LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * pProfile);
+    int LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * ppWinlogonProfile);
     int LoggedOnSAS(DWORD dwSasType);
     int WkstaLockedSAS(DWORD dwSasType);
 

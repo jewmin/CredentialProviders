@@ -9,6 +9,7 @@ void Output(const std::wstring & message);
 std::wstring StringFormat(const wchar_t * format, ...);
 std::wstring StringFormatVa(const wchar_t * format, va_list args);
 std::wstring GetLastErrorString();
+std::wstring GetErrorString(DWORD error_code);
 
 std::string WToA(const std::wstring & input);
 std::string WToA(const wchar_t * input);
