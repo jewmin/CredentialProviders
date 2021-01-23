@@ -218,7 +218,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UI\LogonDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\UI\NoticeDialog.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\UI\SecurityOptionsDialog.cpp"
 					>
 				</File>
 				<File
@@ -276,7 +284,15 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UI\LogonDialog.h"
+					>
+				</File>
+				<File
 					RelativePath=".\UI\NoticeDialog.h"
+					>
+				</File>
+				<File
+					RelativePath=".\UI\SecurityOptionsDialog.h"
 					>
 				</File>
 				<File
