@@ -20,3 +20,4 @@ EXPORTS
     WlxGetConsoleSwitchCredentials                  PRIVATE
     WlxReconnectNotify                              PRIVATE
     WlxDisconnectNotify                             PRIVATE
+    DebugGINA                                       PRIVATE

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Gina"
-	ProjectGUID="{1FBDA398-58DD-4BF0-846B-B0DEEBA62120}"
-	RootNamespace="Gina"
+	Name="FakeWinlogon"
+	ProjectGUID="{C6CE8E07-6ACC-42B5-825D-D7D57A47C35D}"
+	RootNamespace="FakeWinlogon"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -20,7 +20,7 @@
 			Name="Debug|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			>
 			<Tool
@@ -41,8 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Utils&quot;;&quot;$(SolutionDir)libuv\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GINA_EXPORTS"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,12 +60,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Utils.lib Secur32.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(OutDir)\&quot;"
-				ModuleDefinitionFile="Gina.def"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -95,7 +91,7 @@
 			Name="Release|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="2"
+			ConfigurationType="1"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -118,8 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)Utils&quot;;&quot;$(SolutionDir)libuv\include&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GINA_EXPORTS"
+				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				UsePrecompiledHeader="0"
@@ -137,12 +132,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="Utils.lib Secur32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(OutDir)\&quot;"
-				ModuleDefinitionFile="Gina.def"
 				GenerateDebugInformation="true"
-				SubSystem="2"
+				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -179,129 +171,21 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\Dll.cpp"
+				RelativePath=".\main.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\Exports.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Gina.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\IWinlogon.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\MockWinlogon.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\RealWinlogon.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\SecurityHelper.cpp"
-				>
-			</File>
-			<Filter
-				Name="UI"
-				>
-				<File
-					RelativePath=".\UI\GinaModalDialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\GuiHelper.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\LogonDialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\NoticeDialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\SecurityOptionsDialog.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\StatusDialog.cpp"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\Gina.h"
-				>
-			</File>
-			<File
-				RelativePath=".\IWinlogon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\MockWinlogon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\RealWinlogon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\SecurityHelper.h"
-				>
-			</File>
-			<Filter
-				Name="UI"
-				>
-				<File
-					RelativePath=".\UI\GinaModalDialog.h"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\GuiHelper.h"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\LogonDialog.h"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\NoticeDialog.h"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\SecurityOptionsDialog.h"
-					>
-				</File>
-				<File
-					RelativePath=".\UI\StatusDialog.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
-			<File
-				RelativePath=".\Gina.rc"
-				>
-			</File>
 		</Filter>
 	</Files>
 	<Globals>
