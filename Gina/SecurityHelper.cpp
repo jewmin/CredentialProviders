@@ -146,7 +146,7 @@ bool SecurityHelper::CallLsaLogonUser(HANDLE hLsa, const wchar_t * domain, const
     }
 
     // LsaLogonUser - the function from hell
-    NTSTATUS status = LsaLogonUser(
+    NTSTATUS status = ::LsaLogonUser(
         hLsa,
         &logonProcessName,          // we use our logon process name for the "origin name"
         logonType,
@@ -163,7 +163,7 @@ bool SecurityHelper::CallLsaLogonUser(HANDLE hLsa, const wchar_t * domain, const
         &substatus);
 
     if (status) {
-        win32Error = LsaNtStatusToWinError(status);
+        win32Error = ::LsaNtStatusToWinError(status);
 
         if ((ERROR_ACCOUNT_RESTRICTION == win32Error && STATUS_PASSWORD_EXPIRED == substatus)) {
             win32Error = ERROR_PASSWORD_EXPIRED;

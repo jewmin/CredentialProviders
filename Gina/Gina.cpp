@@ -59,7 +59,7 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     pWinlogon_->WlxSetOption(WLX_OPTION_USE_CTRL_ALT_DEL, TRUE, &OldValue);
 
     // 远程登录用户输入模拟Ctrl-Alt-Del
-    if (0 != GetSystemMetrics(SM_REMOTESESSION)) {
+    if (0 != ::GetSystemMetrics(SM_REMOTESESSION)) {
         pWinlogon_->WlxSasNotify(WLX_SAS_TYPE_CTRL_ALT_DEL);
     }
 }
