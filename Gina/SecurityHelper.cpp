@@ -107,7 +107,7 @@ bool SecurityHelper::RegisterLogonProcess(HANDLE * phLsa) {
 
     if (status) {
         *phLsa = 0;
-        Utils::Output(Utils::StringFormat(L"LsaRegisterLogonProcess Error: %d", ::LsaNtStatusToWinError(status)));
+		Utils::Output(Utils::StringFormat(L"LsaRegisterLogonProcess Error: %s", Utils::GetErrorString(::LsaNtStatusToWinError(status)).c_str()));
         return false;
     }
 

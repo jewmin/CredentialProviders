@@ -296,3 +296,18 @@ WlxDisconnectNotify(
     Utils::Output(Utils::StringFormat(L"WlxDisconnectNotify pWlxContext: %p", pWlxContext));
     static_cast<Gina *>(pWlxContext)->DisconnectNotify();
 }
+
+// ต๗สิ
+VOID
+WINAPI
+DebugGINA()
+{
+    Utils::Output(L"DebugGINA");
+    DWORD fakeDllVersion = 0;
+    if (WlxNegotiate(WLX_CURRENT_VERSION, &fakeDllVersion)) {
+        void * pWlxContext;
+        if (WlxInitialize(NULL, NULL, NULL, NULL, &pWlxContext)) {
+            static_cast<Gina *>(pWlxContext)->DisplaySASNotice();
+        }
+    }
+}

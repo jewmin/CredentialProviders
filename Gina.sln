@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Gina", "Gina\Gina.vcproj", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utils", "Utils\Utils.vcproj", "{89182927-777E-4301-AAFE-B731FE6D9BA9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FakeWinlogon", "FakeWinlogon\FakeWinlogon.vcproj", "{C6CE8E07-6ACC-42B5-825D-D7D57A47C35D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -22,6 +24,10 @@ Global
 		{89182927-777E-4301-AAFE-B731FE6D9BA9}.Debug|Win32.Build.0 = Debug|Win32
 		{89182927-777E-4301-AAFE-B731FE6D9BA9}.Release|Win32.ActiveCfg = Release|Win32
 		{89182927-777E-4301-AAFE-B731FE6D9BA9}.Release|Win32.Build.0 = Release|Win32
+		{C6CE8E07-6ACC-42B5-825D-D7D57A47C35D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C6CE8E07-6ACC-42B5-825D-D7D57A47C35D}.Debug|Win32.Build.0 = Debug|Win32
+		{C6CE8E07-6ACC-42B5-825D-D7D57A47C35D}.Release|Win32.ActiveCfg = Release|Win32
+		{C6CE8E07-6ACC-42B5-825D-D7D57A47C35D}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
