@@ -335,9 +335,14 @@ DebugGINA()
     if (WlxNegotiate(WLX_CURRENT_VERSION, &fakeDllVersion)) {
         void * pWlxContext;
         if (WlxInitialize(NULL, NULL, NULL, NULL, &pWlxContext)) {
+            //打开desktop
+            HDESK hdesk = ::OpenDesktop(L"default", 0, FALSE, DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW | DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL | DESKTOP_JOURNALPLAYBACK | DESKTOP_JOURNALRECORD | DESKTOP_READOBJECTS | DESKTOP_SWITCHDESKTOP | DESKTOP_WRITEOBJECTS);
+            if (hdesk) {
+                ::SetThreadDesktop(hdesk);
+            }
             Gina * gina = static_cast<Gina *>(pWlxContext);
-            gina->DisplayStatusMessage(NULL, 0, L"", L"Windows 正在启动...");
-            gina->DisplayStatusMessage(NULL, 0, L"", L"正在应用计算机设置...");
+            gina->DisplayStatusMessage(hdesk, 0, L"", L"Windows 正在启动...");
+            gina->DisplayStatusMessage(hdesk, 0, L"", L"正在应用计算机设置...");
             gina->RemoveStatusMessage();
             gina->RemoveStatusMessage();
             gina->DisplaySASNotice();

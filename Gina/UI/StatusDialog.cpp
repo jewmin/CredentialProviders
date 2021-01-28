@@ -33,7 +33,7 @@ EnterDesktop::EnterDesktop(HDESK hDesktop) {
     hOldDesktop_ = ::GetThreadDesktop(::GetCurrentThreadId());
     if (hDesktop == hOldDesktop_) {
         hOldDesktop_ = NULL;
-    } else if (!SetThreadDesktop(hDesktop)) {
+    } else if (!::SetThreadDesktop(hDesktop)) {
         hOldDesktop_ = NULL;
         Utils::Output(Utils::StringFormat(L"EnterDesktop::EnterDesktop Error: %s", Utils::GetLastErrorString().c_str()));
     }
@@ -41,7 +41,7 @@ EnterDesktop::EnterDesktop(HDESK hDesktop) {
 
 EnterDesktop::~EnterDesktop() {
     if (hOldDesktop_) {
-        if (!SetThreadDesktop(hOldDesktop_)) {
+        if (!::SetThreadDesktop(hOldDesktop_)) {
             Utils::Output(Utils::StringFormat(L"EnterDesktop::~EnterDesktop Error: %s", Utils::GetLastErrorString().c_str()));
         }
     }
