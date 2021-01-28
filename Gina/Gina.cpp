@@ -64,7 +64,9 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     }
 }
 
+// Œ¥µ«¬º
 int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * ppWinlogonProfile) {
+    RemoveStatusMessage();
     *pdwOptions = 0; // ”…Winlogonº”‘ÿ”√ªß≈‰÷√
     ZeroMemory(pNprNotifyInfo, sizeof(*pNprNotifyInfo));
 
@@ -175,7 +177,9 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
     return action;
 }
 
+// “—µ«¬º
 int Gina::LoggedOnSAS(DWORD dwSasType) {
+    RemoveStatusMessage();
     if (WLX_SAS_TYPE_CTRL_ALT_DEL != dwSasType) {
         return WLX_SAS_ACTION_NONE;
     }
@@ -204,7 +208,9 @@ int Gina::LoggedOnSAS(DWORD dwSasType) {
     }
 }
 
+// À¯∆¡
 int Gina::WkstaLockedSAS(DWORD dwSasType) {
+    RemoveStatusMessage();
     // we only support Control-Alt-Delete secure attention sequence (SAS)
     if (WLX_SAS_TYPE_CTRL_ALT_DEL != dwSasType) {
         return WLX_SAS_ACTION_NONE;
@@ -272,11 +278,13 @@ BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOI
 }
 
 VOID Gina::DisplaySASNotice() {
+    RemoveStatusMessage();
     NoticeDialog dlg(pWinlogon_, IDD_SASNOTICE);
     dlg.Show();
 }
 
 VOID Gina::DisplayLockedNotice() {
+    RemoveStatusMessage();
     NoticeDialog dlg(pWinlogon_, IDD_LOCKEDNOTICE);
     dlg.Show();
 }

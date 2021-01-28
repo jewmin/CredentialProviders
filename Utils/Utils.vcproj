@@ -163,7 +163,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IOBuffer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceBase.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Utils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\UvHandler.cpp"
 				>
 			</File>
 			<File
@@ -197,7 +209,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\IOBuffer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\IService.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ServiceBase.h"
 				>
 			</File>
 			<File
@@ -206,6 +226,10 @@
 			</File>
 			<File
 				RelativePath=".\Utils.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UvHandler.h"
 				>
 			</File>
 			<File

@@ -19,6 +19,28 @@ static const PWSTR s_WST_Strings[] =
     L"WLX_SAS_TYPE_MAX_MSFT_VALUE",
 };
 
+static const PWSTR s_WSA_Strings[] =
+{
+    L"",
+    L"WLX_SAS_ACTION_LOGON",
+    L"WLX_SAS_ACTION_NONE",
+    L"WLX_SAS_ACTION_LOCK_WKSTA",
+    L"WLX_SAS_ACTION_LOGOFF",
+    L"WLX_SAS_ACTION_SHUTDOWN",
+    L"WLX_SAS_ACTION_PWD_CHANGED",
+    L"WLX_SAS_ACTION_TASKLIST",
+    L"WLX_SAS_ACTION_UNLOCK_WKSTA",
+    L"WLX_SAS_ACTION_FORCE_LOGOFF",
+    L"WLX_SAS_ACTION_SHUTDOWN_POWER_OFF",
+    L"WLX_SAS_ACTION_SHUTDOWN_REBOOT",
+    L"WLX_SAS_ACTION_SHUTDOWN_SLEEP",
+    L"WLX_SAS_ACTION_SHUTDOWN_SLEEP2",
+    L"WLX_SAS_ACTION_SHUTDOWN_HIBERNATE",
+    L"WLX_SAS_ACTION_RECONNECTED",
+    L"WLX_SAS_ACTION_DELAYED_FORCE_LOGOFF",
+    L"WLX_SAS_ACTION_SWITCH_CONSOLE",
+};
+
 // The WlxNegotiate function must be implemented by a replacement GINA DLL.
 // This is the first call made by Winlogon to the GINA DLL.
 // WlxNegotiate allows the GINA to verify that it supports the installed version of Winlogon.
@@ -75,7 +97,9 @@ WlxLoggedOutSAS(
     )
 {
     Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
-    return static_cast<Gina *>(pWlxContext)->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pNprNotifyInfo, pProfile);
+    int res = static_cast<Gina *>(pWlxContext)->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pNprNotifyInfo, pProfile);
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, res: %s", pWlxContext, s_WSA_Strings[res]));
+    return res;
 }
 
 // Activates the user shell program.
@@ -102,7 +126,9 @@ WlxLoggedOnSAS(
     )
 {
     Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
-    return static_cast<Gina *>(pWlxContext)->LoggedOnSAS(dwSasType);
+    int res = static_cast<Gina *>(pWlxContext)->LoggedOnSAS(dwSasType);
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, res: %s", pWlxContext, s_WSA_Strings[res]));
+    return res;
 }
 
 // Allows the GINA to display information about the lock, such as who locked the workstation and when it was locked.
@@ -125,7 +151,9 @@ WlxWkstaLockedSAS(
     )
 {
     Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
-    return static_cast<Gina *>(pWlxContext)->WkstaLockedSAS(dwSasType);
+    int res = static_cast<Gina *>(pWlxContext)->WkstaLockedSAS(dwSasType);
+    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, res: %s", pWlxContext, s_WSA_Strings[res]));
+    return res;
 }
 
 // Winlogon calls this function before attempting to lock the workstation.
@@ -307,7 +335,12 @@ DebugGINA()
     if (WlxNegotiate(WLX_CURRENT_VERSION, &fakeDllVersion)) {
         void * pWlxContext;
         if (WlxInitialize(NULL, NULL, NULL, NULL, &pWlxContext)) {
-            static_cast<Gina *>(pWlxContext)->DisplaySASNotice();
+			LUID authenticationId;
+			DWORD dwOptions;
+			HANDLE hToken;
+			WLX_MPR_NOTIFY_INFO nprNotifyInfo;
+			WLX_PROFILE_V1_0 * pWinlogonProfile = NULL;
+            static_cast<Gina *>(pWlxContext)->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, NULL, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
         }
     }
 }

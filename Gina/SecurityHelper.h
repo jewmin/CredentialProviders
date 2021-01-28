@@ -7,6 +7,7 @@
 
 class SecurityHelper {
 public:
+    static bool SetSeTcbPrivilege();
     static bool RegisterLogonProcess(HANDLE * phLsa);
     static bool CallLsaLogonUser(HANDLE hLsa, const wchar_t * domain, const wchar_t * user, const wchar_t * pass, SECURITY_LOGON_TYPE logonType, LUID * pLogonSessionId, HANDLE * phToken, MSV1_0_INTERACTIVE_PROFILE * * ppProfile, DWORD * pWin32Error);
     static bool GetLogonSid(HANDLE htok, void * psid, DWORD cbMax);

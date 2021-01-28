@@ -92,6 +92,36 @@ static void _deleteLsaString(LSA_STRING * target) {
     target->Buffer = 0;
 }
 
+bool SecurityHelper::SetSeTcbPrivilege() {
+    TOKEN_PRIVILEGES tp;
+    LUID luid;
+    HANDLE hProcessToken;
+
+    if (!::OpenProcessToken(::GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hProcessToken)) {
+        Utils::Output(Utils::StringFormat(L"SecurityHelper::SetSeTcbPrivilege OpenProcessToken Error: %s", Utils::GetLastErrorString().c_str()));
+        return false;
+    }
+
+    if (!::LookupPrivilegeValue(NULL, SE_TCB_NAME, &luid)) {
+        Utils::Output(Utils::StringFormat(L"SecurityHelper::SetSeTcbPrivilege LookupPrivilegeValue Error: %s", Utils::GetLastErrorString().c_str()));
+        ::CloseHandle(hProcessToken);
+        return false;
+    }
+
+    tp.PrivilegeCount = 1;
+    tp.Privileges[0].Luid = luid;
+    tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+
+    if (!::AdjustTokenPrivileges(hProcessToken, FALSE, &tp, sizeof(TOKEN_PRIVILEGES), NULL, NULL)) {
+        Utils::Output(Utils::StringFormat(L"SecurityHelper::SetSeTcbPrivilege AdjustTokenPrivileges Error: %s", Utils::GetLastErrorString().c_str()));
+        ::CloseHandle(hProcessToken);
+        return false;
+    }
+
+    ::CloseHandle(hProcessToken);
+    return true;
+}
+
 bool SecurityHelper::RegisterLogonProcess(HANDLE * phLsa) {
     *phLsa = 0;
 
