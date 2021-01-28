@@ -335,12 +335,19 @@ DebugGINA()
     if (WlxNegotiate(WLX_CURRENT_VERSION, &fakeDllVersion)) {
         void * pWlxContext;
         if (WlxInitialize(NULL, NULL, NULL, NULL, &pWlxContext)) {
-			LUID authenticationId;
-			DWORD dwOptions;
-			HANDLE hToken;
-			WLX_MPR_NOTIFY_INFO nprNotifyInfo;
-			WLX_PROFILE_V1_0 * pWinlogonProfile = NULL;
-            static_cast<Gina *>(pWlxContext)->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, NULL, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
+            Gina * gina = static_cast<Gina *>(pWlxContext);
+            gina->DisplayStatusMessage(NULL, 0, L"", L"Windows 正在启动...");
+            gina->DisplayStatusMessage(NULL, 0, L"", L"正在应用计算机设置...");
+            gina->RemoveStatusMessage();
+            gina->RemoveStatusMessage();
+            gina->DisplaySASNotice();
+            gina->RemoveStatusMessage();
+            LUID authenticationId;
+            DWORD dwOptions;
+            HANDLE hToken;
+            WLX_MPR_NOTIFY_INFO nprNotifyInfo;
+            WLX_PROFILE_V1_0 * pWinlogonProfile = NULL;
+            gina->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, NULL, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
         }
     }
 }
