@@ -280,7 +280,7 @@ BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOI
 
 VOID Gina::DisplaySASNotice() {
     RemoveStatusMessage();
-    pGinaWindow_ = new NoticeWindow(NULL, IDD_SASNOTICE);
+    pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_SASNOTICE);
     if (!pGinaWindow_) {
         Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
     }
@@ -288,7 +288,7 @@ VOID Gina::DisplaySASNotice() {
 
 VOID Gina::DisplayLockedNotice() {
     RemoveStatusMessage();
-    pGinaWindow_ = new NoticeWindow(NULL, IDD_LOCKEDNOTICE);
+    pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_LOCKEDNOTICE);
     if (!pGinaWindow_) {
         Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
     }
