@@ -1,31 +1,26 @@
-#include "StatusDialog.h"
+#include "GinaWindow.h"
 
-StatusDialog::StatusDialog(HDESK hDesktop, PWSTR pTitle, PWSTR pMessage)
+GinaWindow::GinaWindow(HDESK hDesktop, int nDialogResourceID, HINSTANCE hInst)
     : hDesktop_(hDesktop) {
     EnterDesktop enter(hDesktop_);
-    hWnd_ = ::CreateDialog(GetInstance(), MAKEINTRESOURCE(IDD_STATUS), NULL, StatusDialog::DlgProc);
+    hWnd_ = ::CreateDialog(hInst, MAKEINTRESOURCE(nDialogResourceID), NULL, GinaWindow::DlgProc);
     if (!hWnd_) {
-        Utils::Output(Utils::StringFormat(L"StatusDialog::StatusDialog Error: %s", Utils::GetLastErrorString().c_str()));
+        Utils::Output(Utils::StringFormat(L"GinaWindow::GinaWindow Error: %s", Utils::GetLastErrorString().c_str()));
         return;
     }
 
     GuiHelper::CenterWindow(hWnd_);
     ::ShowWindow(hWnd_, SW_SHOW);
-    if (GuiHelper::SetControlText(hWnd_, IDC_MESSAGE, pMessage)) {
-        if (pTitle) {
-            ::SetWindowText(hWnd_, pTitle);
-        }
-    }
 }
 
-StatusDialog::~StatusDialog() {
+GinaWindow::~GinaWindow() {
     EnterDesktop enter(hDesktop_);
     if (hWnd_) {
         ::DestroyWindow(hWnd_);
     }
 }
 
-INT_PTR CALLBACK StatusDialog::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+INT_PTR CALLBACK GinaWindow::DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     return FALSE;
 }
 

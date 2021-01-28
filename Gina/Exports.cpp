@@ -342,17 +342,21 @@ DebugGINA()
             }
             Gina * gina = static_cast<Gina *>(pWlxContext);
             gina->DisplayStatusMessage(hdesk, 0, L"", L"Windows 正在启动...");
+            ::Sleep(3000);
             gina->DisplayStatusMessage(hdesk, 0, L"", L"正在应用计算机设置...");
+            ::Sleep(3000);
             gina->RemoveStatusMessage();
             gina->RemoveStatusMessage();
             gina->DisplaySASNotice();
+            ::Sleep(3000);
             gina->RemoveStatusMessage();
             LUID authenticationId;
+            SID logonSid;
             DWORD dwOptions;
             HANDLE hToken;
             WLX_MPR_NOTIFY_INFO nprNotifyInfo;
             WLX_PROFILE_V1_0 * pWinlogonProfile = NULL;
-            gina->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, NULL, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
+            gina->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, &logonSid, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
         }
     }
 }

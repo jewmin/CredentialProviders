@@ -2,7 +2,7 @@
 
 #include "IWinlogon.h"
 #include "Utils.h"
-#include "UI/StatusDialog.h"
+#include "UI/GinaWindow.h"
 
 class Gina {
 public:
@@ -46,5 +46,5 @@ private:
     HANDLE                  hLsaHandle_;            // Pointer that receives a handle used in future authentication function calls.
     HANDLE                  hUserToken_;            // Handle of the users token.
     PWSTR                   pszProfilePath_;        // UNICODE_STRING specifying the path to the user's roaming profile if the user has a roaming profile. For example: \SomeServer\SomeShare\MyUserName
-    StatusDialog *          pStatusDialog_;         // 显示状态消息对话框
+    GinaWindow *            pGinaWindow_;           // 显示状态消息窗口
 };

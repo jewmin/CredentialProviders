@@ -6,15 +6,15 @@
 
 extern HINSTANCE GetInstance();
 
-class StatusDialog {
+class GinaWindow {
 public:
-    StatusDialog(HDESK hDesktop, PWSTR pTitle, PWSTR pMessage);
-    ~StatusDialog();
+    GinaWindow(HDESK hDesktop, int nDialogResourceID, HINSTANCE hInst = GetInstance());
+    virtual ~GinaWindow();
 
 protected:
     static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-private:
+protected:
     HDESK hDesktop_;
     HWND hWnd_;
 };

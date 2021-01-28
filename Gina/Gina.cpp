@@ -2,7 +2,8 @@
 #include "MockWinlogon.h"
 #include "RealWinlogon.h"
 #include "SecurityHelper.h"
-#include "UI/NoticeDialog.h"
+#include "UI/NoticeWindow.h"
+#include "UI/StatusWindow.h"
 #include "UI/SecurityOptionsDialog.h"
 #include "UI/LogonDialog.h"
 
@@ -53,7 +54,7 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     , hLsaHandle_(LsaHandle)
     , hUserToken_(NULL)
     , pszProfilePath_(NULL)
-    , pStatusDialog_(NULL) {
+    , pGinaWindow_(NULL) {
     // 告诉Winlogon我们使用Ctrl-Alt-Del
     ULONG_PTR OldValue;
     pWinlogon_->WlxSetOption(WLX_OPTION_USE_CTRL_ALT_DEL, TRUE, &OldValue);
@@ -279,14 +280,18 @@ BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOI
 
 VOID Gina::DisplaySASNotice() {
     RemoveStatusMessage();
-    NoticeDialog dlg(pWinlogon_, IDD_SASNOTICE);
-    dlg.Show();
+    pGinaWindow_ = new NoticeWindow(NULL, IDD_SASNOTICE);
+    if (!pGinaWindow_) {
+        Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
+    }
 }
 
 VOID Gina::DisplayLockedNotice() {
     RemoveStatusMessage();
-    NoticeDialog dlg(pWinlogon_, IDD_LOCKEDNOTICE);
-    dlg.Show();
+    pGinaWindow_ = new NoticeWindow(NULL, IDD_LOCKEDNOTICE);
+    if (!pGinaWindow_) {
+        Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
+    }
 }
 
 BOOL Gina::IsLockOk() {
@@ -330,9 +335,9 @@ BOOL Gina::NetworkProviderLoad(PWLX_MPR_NOTIFY_INFO pNprNotifyInfo) {
 
 BOOL Gina::DisplayStatusMessage(HDESK hDesktop, DWORD dwOptions, PWSTR pTitle, PWSTR pMessage) {
     RemoveStatusMessage();
-    pStatusDialog_ = new StatusDialog(hDesktop, pTitle, pMessage);
-    if (!pStatusDialog_) {
-        Utils::Output(L"Gina::DisplayStatusMessage pStatusDialog_: Out Of Memory");
+    pGinaWindow_ = new StatusWindow(hDesktop, pTitle, pMessage);
+    if (!pGinaWindow_) {
+        Utils::Output(L"Gina::DisplayStatusMessage pGinaWindow_: Out Of Memory");
         return FALSE;
     }
     return TRUE;
@@ -343,9 +348,9 @@ BOOL Gina::GetStatusMessage(DWORD * pdwOptions, PWSTR pMessage, DWORD dwBufferSi
 }
 
 BOOL Gina::RemoveStatusMessage() {
-    if (pStatusDialog_) {
-        delete pStatusDialog_;
-        pStatusDialog_ = NULL;
+    if (pGinaWindow_) {
+        delete pGinaWindow_;
+        pGinaWindow_ = NULL;
     }
     return TRUE;
 }

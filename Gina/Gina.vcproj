@@ -214,6 +214,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UI\GinaWindow.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\UI\GuiHelper.cpp"
 					>
 				</File>
@@ -222,7 +226,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\UI\NoticeDialog.cpp"
+					RelativePath=".\UI\NoticeWindow.cpp"
 					>
 				</File>
 				<File
@@ -230,7 +234,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\UI\StatusDialog.cpp"
+					RelativePath=".\UI\StatusWindow.cpp"
 					>
 				</File>
 			</Filter>
@@ -272,6 +276,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UI\GinaWindow.h"
+					>
+				</File>
+				<File
 					RelativePath=".\UI\GuiHelper.h"
 					>
 				</File>
@@ -280,7 +288,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\UI\NoticeDialog.h"
+					RelativePath=".\UI\NoticeWindow.h"
 					>
 				</File>
 				<File
@@ -288,7 +296,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\UI\StatusDialog.h"
+					RelativePath=".\UI\StatusWindow.h"
 					>
 				</File>
 			</Filter>
