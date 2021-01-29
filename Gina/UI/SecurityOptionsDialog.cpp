@@ -12,9 +12,9 @@ SecurityOptionsDialog::~SecurityOptionsDialog() {
 INT_PTR SecurityOptionsDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
     case WM_INITDIALOG: {
-            WCHAR szLogonMsg[6 + SecurityOptionsDialog::MaxSizeUserName] = L"User: ";
-            if (SecurityHelper::ImpersonateAndGetUserName(hUserToken_, szLogonMsg + 6, SecurityOptionsDialog::MaxSizeUserName)) {
-                GuiHelper::SetControlText(hWnd_, IDC_NAME, szLogonMsg);
+            WCHAR szUserName[GinaModalDialog::MaxSizeUserName] = L"";
+            if (SecurityHelper::ImpersonateAndGetUserName(hUserToken_, szUserName, GinaModalDialog::MaxSizeUserName)) {
+                GuiHelper::SetControlText(hWnd_, IDC_NAME, Utils::StringFormat(L"You are logged in as %s.", szUserName).c_str());
             }
         }
         return TRUE;

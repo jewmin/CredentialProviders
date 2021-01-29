@@ -285,7 +285,7 @@ VOID Gina::DisplaySASNotice() {
     // if (!pGinaWindow_) {
     //     Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
     // }
-    NoticeDialog dlg(pWinlogon_, IDD_SASNOTICE);
+    NoticeDialog dlg(pWinlogon_, hUserToken_, IDD_SASNOTICE);
     dlg.Show();
 }
 
@@ -295,7 +295,7 @@ VOID Gina::DisplayLockedNotice() {
     // if (!pGinaWindow_) {
     //     Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
     // }
-    NoticeDialog dlg(pWinlogon_, IDD_LOCKEDNOTICE);
+    NoticeDialog dlg(pWinlogon_, hUserToken_, IDD_LOCKEDNOTICE);
     dlg.Show();
 }
 

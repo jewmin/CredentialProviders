@@ -18,6 +18,9 @@ protected:
     static INT_PTR CALLBACK DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 protected:
+    static const int MaxSizeUserName = 21;
+
+protected:
     IWinlogon *             pWinlogon_;
     int                     nDialogResourceID_;
     HINSTANCE               hInst_;

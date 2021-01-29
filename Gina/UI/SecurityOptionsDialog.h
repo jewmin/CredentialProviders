@@ -22,8 +22,5 @@ public:
     };
 
 private:
-    static const int MaxSizeUserName = 21;
-
-private:
     HANDLE hUserToken_;
 };
