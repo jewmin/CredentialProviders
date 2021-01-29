@@ -342,13 +342,13 @@ DebugGINA()
             }
             Gina * gina = static_cast<Gina *>(pWlxContext);
             gina->DisplayStatusMessage(hdesk, 0, L"", L"Windows 正在启动...");
-            ::Sleep(3000);
+            ::Sleep(2000);
             gina->DisplayStatusMessage(hdesk, 0, L"", L"正在应用计算机设置...");
-            ::Sleep(3000);
+            ::Sleep(2000);
             gina->RemoveStatusMessage();
             gina->RemoveStatusMessage();
             gina->DisplaySASNotice();
-            ::Sleep(3000);
+            ::Sleep(2000);
             gina->RemoveStatusMessage();
             LUID authenticationId;
             SID logonSid;
@@ -361,10 +361,30 @@ DebugGINA()
                 res = gina->LoggedOnSAS(WLX_SAS_TYPE_CTRL_ALT_DEL);
                 if (res == WLX_SAS_ACTION_LOCK_WKSTA) {
                     gina->WkstaLockedSAS(WLX_SAS_TYPE_CTRL_ALT_DEL);
-                } else if (res == WLX_SAS_ACTION_LOGOFF || res == WLX_SAS_ACTION_SHUTDOWN) {
+                } else if (res == WLX_SAS_ACTION_LOGOFF) {
+                    gina->Logoff();
                     gina->DisplaySASNotice();
-                    ::Sleep(3000);
+                    ::Sleep(2000);
+                } else if (res == WLX_SAS_ACTION_SHUTDOWN) {
+                    gina->Shutdown(0);
+                    gina->DisplaySASNotice();
+                    ::Sleep(2000);
                 }
+            }
+            if (nprNotifyInfo.pszDomain) {
+                ::LocalFree(nprNotifyInfo.pszDomain);
+            }
+            if (nprNotifyInfo.pszPassword) {
+                ::LocalFree(nprNotifyInfo.pszPassword);
+            }
+            if (nprNotifyInfo.pszUserName) {
+                ::LocalFree(nprNotifyInfo.pszUserName);
+            }
+            if (nprNotifyInfo.pszOldPassword) {
+                ::LocalFree(nprNotifyInfo.pszOldPassword);
+            }
+            if (pWinlogonProfile) {
+                ::LocalFree(pWinlogonProfile);
             }
         }
     }

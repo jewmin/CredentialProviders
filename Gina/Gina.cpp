@@ -6,6 +6,7 @@
 #include "UI/StatusWindow.h"
 #include "UI/SecurityOptionsDialog.h"
 #include "UI/LogonDialog.h"
+#include "UI/NoticeDialog.h"
 
 // length of a Windows logon SID of the form S-1-5-5-x-y
 #define LOGON_SID_SIZE 20
@@ -280,18 +281,22 @@ BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOI
 
 VOID Gina::DisplaySASNotice() {
     RemoveStatusMessage();
-    pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_SASNOTICE);
-    if (!pGinaWindow_) {
-        Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
-    }
+    // pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_SASNOTICE);
+    // if (!pGinaWindow_) {
+    //     Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
+    // }
+    NoticeDialog dlg(pWinlogon_, IDD_SASNOTICE);
+    dlg.Show();
 }
 
 VOID Gina::DisplayLockedNotice() {
     RemoveStatusMessage();
-    pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_LOCKEDNOTICE);
-    if (!pGinaWindow_) {
-        Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
-    }
+    // pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_LOCKEDNOTICE);
+    // if (!pGinaWindow_) {
+    //     Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
+    // }
+    NoticeDialog dlg(pWinlogon_, IDD_LOCKEDNOTICE);
+    dlg.Show();
 }
 
 BOOL Gina::IsLockOk() {

@@ -226,6 +226,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\UI\NoticeDialog.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\UI\NoticeWindow.cpp"
 					>
 				</File>
@@ -285,6 +289,10 @@
 				</File>
 				<File
 					RelativePath=".\UI\LogonDialog.h"
+					>
+				</File>
+				<File
+					RelativePath=".\UI\NoticeDialog.h"
 					>
 				</File>
 				<File
