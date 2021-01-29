@@ -356,7 +356,16 @@ DebugGINA()
             HANDLE hToken;
             WLX_MPR_NOTIFY_INFO nprNotifyInfo;
             WLX_PROFILE_V1_0 * pWinlogonProfile = NULL;
-            gina->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, &logonSid, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
+            int res = gina->LoggedOutSAS(WLX_SAS_TYPE_CTRL_ALT_DEL, &authenticationId, &logonSid, &dwOptions, &hToken, &nprNotifyInfo, (PVOID *)&pWinlogonProfile);
+            if (res == WLX_SAS_ACTION_LOGON) {
+                res = gina->LoggedOnSAS(WLX_SAS_TYPE_CTRL_ALT_DEL);
+                if (res == WLX_SAS_ACTION_LOCK_WKSTA) {
+                    gina->WkstaLockedSAS(WLX_SAS_TYPE_CTRL_ALT_DEL);
+                } else if (res == WLX_SAS_ACTION_LOGOFF || res == WLX_SAS_ACTION_SHUTDOWN) {
+                    gina->DisplaySASNotice();
+                    ::Sleep(3000);
+                }
+            }
         }
     }
 }

@@ -75,10 +75,10 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
     const wchar_t * domain      = NULL;
     const wchar_t * username    = NULL;
     const wchar_t * password    = NULL;
+    LogonDialog dlg(pWinlogon_);
 
     if (WLX_SAS_TYPE_CTRL_ALT_DEL == dwSasType) {
         // 登录对话框，获取域名、用户名、密码
-        LogonDialog dlg(pWinlogon_);
         if (IDOK != dlg.Show()) {
             return WLX_SAS_ACTION_NONE;
         }
