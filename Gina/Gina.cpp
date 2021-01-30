@@ -68,7 +68,7 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
 
 // 未登录
 int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid, PDWORD pdwOptions, PHANDLE phToken, PWLX_MPR_NOTIFY_INFO pNprNotifyInfo, PVOID * ppWinlogonProfile) {
-    RemoveStatusMessage();
+    // RemoveStatusMessage();
     *pdwOptions = 0; // 由Winlogon加载用户配置
     ZeroMemory(pNprNotifyInfo, sizeof(*pNprNotifyInfo));
 
@@ -80,7 +80,14 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
 
     if (WLX_SAS_TYPE_CTRL_ALT_DEL == dwSasType) {
         // 登录对话框，获取域名、用户名、密码
-        if (IDOK != dlg.Show()) {
+        // if (IDOK != dlg.Show()) {
+        //     return WLX_SAS_ACTION_NONE;
+        // }
+        int dialog_result = dlg.Show();
+        if (IDOK != dialog_result) {
+            if (IDC_SHUTDOWN == dialog_result) {
+                return WLX_SAS_ACTION_SHUTDOWN;
+            }
             return WLX_SAS_ACTION_NONE;
         }
 
@@ -181,7 +188,7 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
 
 // 已登录
 int Gina::LoggedOnSAS(DWORD dwSasType) {
-    RemoveStatusMessage();
+    // RemoveStatusMessage();
     if (WLX_SAS_TYPE_CTRL_ALT_DEL != dwSasType) {
         return WLX_SAS_ACTION_NONE;
     }
@@ -212,7 +219,7 @@ int Gina::LoggedOnSAS(DWORD dwSasType) {
 
 // 锁屏
 int Gina::WkstaLockedSAS(DWORD dwSasType) {
-    RemoveStatusMessage();
+    // RemoveStatusMessage();
     // we only support Control-Alt-Delete secure attention sequence (SAS)
     if (WLX_SAS_TYPE_CTRL_ALT_DEL != dwSasType) {
         return WLX_SAS_ACTION_NONE;
@@ -226,7 +233,8 @@ int Gina::WkstaLockedSAS(DWORD dwSasType) {
         LogonDialog dlg(pWinlogon_);
 
         // collect credentials from user
-        if (IDOK == dlg.Show()) {
+        int dialog_result = dlg.Show();
+        if (IDOK == dialog_result) {
             // attempt the login
             DWORD win32Error;
             HANDLE hUnlockToken;
@@ -251,6 +259,8 @@ int Gina::WkstaLockedSAS(DWORD dwSasType) {
                 std::wstring msg = Utils::GetErrorString(win32Error);
                 pWinlogon_->WlxMessageBox(NULL, const_cast<LPWSTR>(msg.c_str()), L"Logon Message", MB_ICONEXCLAMATION);
             }
+        } else if (IDC_SHUTDOWN == dialog_result) {
+            result = WLX_SAS_ACTION_SHUTDOWN;
         }
     }
 
@@ -280,7 +290,7 @@ BOOL Gina::ActivateUserShell(PWSTR pszDesktopName, PWSTR pszMprLogonScript, PVOI
 }
 
 VOID Gina::DisplaySASNotice() {
-    RemoveStatusMessage();
+    // RemoveStatusMessage();
     // pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_SASNOTICE);
     // if (!pGinaWindow_) {
     //     Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");
@@ -290,7 +300,7 @@ VOID Gina::DisplaySASNotice() {
 }
 
 VOID Gina::DisplayLockedNotice() {
-    RemoveStatusMessage();
+    // RemoveStatusMessage();
     // pGinaWindow_ = new NoticeWindow(::GetThreadDesktop(::GetCurrentThreadId()), IDD_LOCKEDNOTICE);
     // if (!pGinaWindow_) {
     //     Utils::Output(L"Gina::DisplaySASNotice pGinaWindow_: Out Of Memory");

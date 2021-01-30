@@ -51,7 +51,7 @@ WlxNegotiate(
     PDWORD                  pdwDllVersion
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxNegotiate dwWinlogonVersion: %u", dwWinlogonVersion));
+    Utils::Output(Utils::StringFormat(L"WlxNegotiate - dwWinlogonVersion: %u", dwWinlogonVersion));
     return Gina::Negotiate(dwWinlogonVersion, pdwDllVersion);
 }
 
@@ -67,7 +67,7 @@ WlxInitialize(
     PVOID *                 pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxInitialize lpWinsta: %s, hWlx: %p, pWinlogonFunctions: %p", lpWinsta, hWlx, pWinlogonFunctions));
+    Utils::Output(Utils::StringFormat(L"WlxInitialize - lpWinsta: %s, hWlx: %p, pWinlogonFunctions: %p", lpWinsta, hWlx, pWinlogonFunctions));
     return Gina::Initialize(hWlx, pWinlogonFunctions, reinterpret_cast<Gina * *>(pWlxContext));
 }
 
@@ -78,7 +78,7 @@ WlxDisplaySASNotice(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxDisplaySASNotice pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxDisplaySASNotice"));
     static_cast<Gina *>(pWlxContext)->DisplaySASNotice();
 }
 
@@ -96,9 +96,9 @@ WlxLoggedOutSAS(
     PVOID *                 pProfile
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS - dwSasType: %s", s_WST_Strings[dwSasType]));
     int res = static_cast<Gina *>(pWlxContext)->LoggedOutSAS(dwSasType, pAuthenticationId, pLogonSid, pdwOptions, phToken, pNprNotifyInfo, pProfile);
-    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS pWlxContext: %p, res: %s", pWlxContext, s_WSA_Strings[res]));
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOutSAS - res: %s", s_WSA_Strings[res]));
     return res;
 }
 
@@ -112,7 +112,7 @@ WlxActivateUserShell(
     PVOID                   pEnvironment
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxActivateUserShell pWlxContext: %p, pszDesktopName: %s", pWlxContext, pszDesktopName));
+    Utils::Output(Utils::StringFormat(L"WlxActivateUserShell - pszDesktopName: %s, pszMprLogonScript: %s, pEnvironment: %p", pszDesktopName, pszMprLogonScript, pEnvironment));
     return static_cast<Gina *>(pWlxContext)->ActivateUserShell(pszDesktopName, pszMprLogonScript, pEnvironment);
 }
 
@@ -125,9 +125,9 @@ WlxLoggedOnSAS(
     PVOID                   pReserved
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS - dwSasType: %s", s_WST_Strings[dwSasType]));
     int res = static_cast<Gina *>(pWlxContext)->LoggedOnSAS(dwSasType);
-    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS pWlxContext: %p, res: %s", pWlxContext, s_WSA_Strings[res]));
+    Utils::Output(Utils::StringFormat(L"WlxLoggedOnSAS - res: %s", s_WSA_Strings[res]));
     return res;
 }
 
@@ -138,7 +138,7 @@ WlxDisplayLockedNotice(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxDisplayLockedNotice pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxDisplayLockedNotice"));
     static_cast<Gina *>(pWlxContext)->DisplayLockedNotice();
 }
 
@@ -150,9 +150,9 @@ WlxWkstaLockedSAS(
     DWORD                   dwSasType
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, dwSasType: %s", pWlxContext, s_WST_Strings[dwSasType]));
+    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS - dwSasType: %s", s_WST_Strings[dwSasType]));
     int res = static_cast<Gina *>(pWlxContext)->WkstaLockedSAS(dwSasType);
-    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS pWlxContext: %p, res: %s", pWlxContext, s_WSA_Strings[res]));
+    Utils::Output(Utils::StringFormat(L"WlxWkstaLockedSAS - res: %s", s_WSA_Strings[res]));
     return res;
 }
 
@@ -163,7 +163,7 @@ WlxIsLockOk(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxIsLockOk pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxIsLockOk"));
     return static_cast<Gina *>(pWlxContext)->IsLockOk();
 }
 
@@ -174,7 +174,7 @@ WlxIsLogoffOk(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxIsLogoffOk pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxIsLogoffOk"));
     return static_cast<Gina *>(pWlxContext)->IsLogoffOk();
 }
 
@@ -185,7 +185,7 @@ WlxLogoff(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxLogoff pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxLogoff"));
     static_cast<Gina *>(pWlxContext)->Logoff();
 }
 
@@ -197,7 +197,7 @@ WlxShutdown(
     DWORD                   ShutdownType
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxShutdown pWlxContext: %p, ShutdownType: %u", pWlxContext, ShutdownType));
+    Utils::Output(Utils::StringFormat(L"WlxShutdown - ShutdownType: %u", ShutdownType));
     static_cast<Gina *>(pWlxContext)->Shutdown(ShutdownType);
 }
 
@@ -213,7 +213,7 @@ WlxScreenSaverNotify(
     PVOID                   pWlxContext,
     BOOL *                  pSecure)
 {
-    Utils::Output(Utils::StringFormat(L"WlxScreenSaverNotify pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxScreenSaverNotify"));
     return static_cast<Gina *>(pWlxContext)->ScreenSaverNotify(pSecure);
 }
 
@@ -227,7 +227,7 @@ WlxStartApplication(
     PWSTR                   pszCmdLine
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxStartApplication pWlxContext: %p, pszDesktopName: %s", pWlxContext, pszDesktopName));
+    Utils::Output(Utils::StringFormat(L"WlxStartApplication - pszDesktopName: %s, pszCmdLine: %s, pEnvironment: %p", pszDesktopName, pszCmdLine, pEnvironment));
     return static_cast<Gina *>(pWlxContext)->StartApplication(pszDesktopName, pEnvironment, pszCmdLine);
 }
 
@@ -243,7 +243,7 @@ WlxNetworkProviderLoad(
     PWLX_MPR_NOTIFY_INFO    pNprNotifyInfo
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxNetworkProviderLoad pWlxContext: %p, pNprNotifyInfo: %p", pWlxContext, pNprNotifyInfo));
+    Utils::Output(Utils::StringFormat(L"WlxNetworkProviderLoad - pNprNotifyInfo: %p", pNprNotifyInfo));
     return static_cast<Gina *>(pWlxContext)->NetworkProviderLoad(pNprNotifyInfo);
 }
 
@@ -258,7 +258,7 @@ WlxDisplayStatusMessage(
     PWSTR                   pMessage
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxDisplayStatusMessage pWlxContext: %p, pTitle: %s, pMessage: %s", pWlxContext, pTitle, pMessage));
+    Utils::Output(Utils::StringFormat(L"WlxDisplayStatusMessage - hDesktop: %p, dwOptions: %u, pTitle: %s, pMessage: %s", hDesktop, dwOptions, pTitle, pMessage));
     return static_cast<Gina *>(pWlxContext)->DisplayStatusMessage(hDesktop, dwOptions, pTitle, pMessage);
 }
 
@@ -272,7 +272,7 @@ WlxGetStatusMessage(
     DWORD                   dwBufferSize
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxGetStatusMessage pWlxContext: %p, pMessage: %s", pWlxContext, pMessage));
+    Utils::Output(Utils::StringFormat(L"WlxGetStatusMessage - pMessage: %s", pMessage));
     return static_cast<Gina *>(pWlxContext)->GetStatusMessage(pdwOptions, pMessage, dwBufferSize);
 }
 
@@ -283,7 +283,7 @@ WlxRemoveStatusMessage(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxRemoveStatusMessage pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxRemoveStatusMessage"));
     return static_cast<Gina *>(pWlxContext)->RemoveStatusMessage();
 }
 
@@ -299,7 +299,7 @@ WlxGetConsoleSwitchCredentials(
     PVOID                   pCredInfo
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxGetConsoleSwitchCredentials pWlxContext: %p, pCredInfo: %p", pWlxContext, pCredInfo));
+    Utils::Output(Utils::StringFormat(L"WlxGetConsoleSwitchCredentials - pCredInfo: %p", pCredInfo));
     return static_cast<Gina *>(pWlxContext)->GetConsoleSwitchCredentials(static_cast<PWLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0>(pCredInfo));
 }
 
@@ -310,7 +310,7 @@ WlxReconnectNotify(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxReconnectNotify pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxReconnectNotify"));
     static_cast<Gina *>(pWlxContext)->ReconnectNotify();
 }
 
@@ -321,7 +321,7 @@ WlxDisconnectNotify(
     PVOID                   pWlxContext
     )
 {
-    Utils::Output(Utils::StringFormat(L"WlxDisconnectNotify pWlxContext: %p", pWlxContext));
+    Utils::Output(Utils::StringFormat(L"WlxDisconnectNotify"));
     static_cast<Gina *>(pWlxContext)->DisconnectNotify();
 }
 
@@ -335,7 +335,7 @@ DebugGINA()
     if (WlxNegotiate(WLX_CURRENT_VERSION, &fakeDllVersion)) {
         void * pWlxContext;
         if (WlxInitialize(NULL, NULL, NULL, NULL, &pWlxContext)) {
-            //打开desktop
+            // 打开desktop
             HDESK hdesk = ::OpenDesktop(L"default", 0, FALSE, DESKTOP_CREATEMENU | DESKTOP_CREATEWINDOW | DESKTOP_ENUMERATE | DESKTOP_HOOKCONTROL | DESKTOP_JOURNALPLAYBACK | DESKTOP_JOURNALRECORD | DESKTOP_READOBJECTS | DESKTOP_SWITCHDESKTOP | DESKTOP_WRITEOBJECTS);
             if (hdesk) {
                 ::SetThreadDesktop(hdesk);

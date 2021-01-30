@@ -33,8 +33,17 @@ INT_PTR LogonDialog::DialogProc(UINT uMsg, WPARAM wParam, LPARAM lParam) {
         case IDCANCEL:
             ::EndDialog(hWnd_, IDCANCEL);
             break;
+
+        case IDC_SHUTDOWN:
+            if (ConfirmShutdown()) {
+                ::EndDialog(hWnd_, IDC_SHUTDOWN);
+            }
         }
         return TRUE;
     }
     return FALSE;
+}
+
+bool LogonDialog::ConfirmShutdown() {
+    return IDOK == pWinlogon_->WlxMessageBox(hWnd_, L"Are you sure you want to shut down?", L"Shut Down Windows", MB_ICONQUESTION | MB_OKCANCEL);
 }
