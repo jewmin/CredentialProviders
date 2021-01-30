@@ -1,5 +1,12 @@
 使用说明
 
+开发环境：win10 + vs2008
+目标环境：需要安装vs2008运行时库
+为什么选择vs2008，因为vs2010以后编译的程序不再支持win2000系统
+
+x86：https://www.microsoft.com/zh-CN/download/details.aspx?id=29
+x64：https://www.microsoft.com/zh-CN/download/details.aspx?id=15336
+
 1）安装Gina
 如果是x86系统，复制Win32的dll到C:\Windows\System32目录
 如果是x64系统，复制x64的dll到C:\Windows\System32目录

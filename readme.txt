@@ -1,5 +1,12 @@
 使用说明
 
+开发环境：win10 + vs2017
+目标环境：需要安装vs2017运行时库
+
+https://support.microsoft.com/zh-cn/topic/%E6%9C%80%E6%96%B0%E6%94%AF%E6%8C%81%E7%9A%84-visual-c-%E4%B8%8B%E8%BD%BD-2647da03-1eea-4433-9aff-95f26a218cc0
+https://aka.ms/vs/16/release/vc_redist.x86.exe
+https://aka.ms/vs/16/release/vc_redist.x64.exe
+
 1）安装凭证
 如果是x86系统，复制Win32的dll到C:\Windows\System32目录
 如果是x64系统，复制x64的dll到C:\Windows\System32目录

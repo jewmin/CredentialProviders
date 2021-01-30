@@ -527,7 +527,7 @@ HRESULT CSampleCredential::GetSerialization(
 	if (_response.Result != Utils::Protocol::LoginResponse::AuthSuccess)
 	{
 		CoTaskMemFree(_rgFieldStrings[SFI_FAILURE_TEXT]);
-		hr = SHStrDupW(L"未知错误，请联系管理员", &_rgFieldStrings[SFI_FAILURE_TEXT]);
+		hr = SHStrDupW(L"ERROR: 未知错误，请联系管理员", &_rgFieldStrings[SFI_FAILURE_TEXT]);
 		if (SUCCEEDED(hr))
 		{
 			for (DWORD i = 0; i < ARRAYSIZE(s_rgAuthResponse); i++)
