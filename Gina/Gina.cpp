@@ -98,31 +98,8 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
 
         // 授权验证，这里可以添加自己的提示信息，比如创建一个无模态对话框
         Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), dlg.username_, dlg.password_);
-        pService_->Auth(&request, &response);
+        Auth(&request, &response);
         if (response.Result != Utils::Protocol::LoginResponse::AuthSuccess) {
-            std::wstring msg;
-            switch (response.Result) {
-                case Utils::Protocol::LoginResponse::AuthFailed:
-                    msg = L"ERROR: 授权失败";
-                    break;
-
-                case Utils::Protocol::LoginResponse::UserCancel:
-                    msg = L"ERROR: 用户取消";
-                    break;
-
-                case Utils::Protocol::LoginResponse::Timeout:
-                    msg = L"ERROR: 授权超时";
-                    break;
-
-                case Utils::Protocol::LoginResponse::ConnectFailed:
-                    msg = L"ERROR: 连接失败";
-                    break;
-
-                default:
-                    msg = L"ERROR: 未知错误，请联系管理员";
-                    break;
-            }
-            pWinlogon_->WlxMessageBox(NULL, const_cast<LPWSTR>(msg.c_str()), L"Logon Message", MB_ICONEXCLAMATION);
             return WLX_SAS_ACTION_NONE;
         }
 
@@ -274,10 +251,18 @@ int Gina::WkstaLockedSAS(DWORD dwSasType) {
         // collect credentials from user
         int dialog_result = dlg.Show();
         if (IDOK == dialog_result) {
+            // 授权验证，这里可以添加自己的提示信息，比如创建一个无模态对话框
+            Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), dlg.username_, dlg.password_);
+            Utils::Protocol::LoginResponse response;
+            Auth(&request, &response);
+            if (response.Result != Utils::Protocol::LoginResponse::AuthSuccess) {
+                return WLX_SAS_ACTION_NONE;
+            }
+
             // attempt the login
             DWORD win32Error;
             HANDLE hUnlockToken;
-            if (SecurityHelper::CallLsaLogonUser(hLsaHandle_, dlg.domain_, dlg.username_, dlg.password_, Unlock, 0, &hUnlockToken, 0, &win32Error)) {
+            if (SecurityHelper::CallLsaLogonUser(hLsaHandle_, dlg.domain_, response.UserName, response.Password, Unlock, 0, &hUnlockToken, 0, &win32Error)) {
                 bool isSameUser;
                 if (SecurityHelper::IsSameUser(hUnlockToken, hUserToken_, &isSameUser) && isSameUser) {
                     // user has returned to unlock her workstation
@@ -443,4 +428,33 @@ VOID Gina::ReconnectNotify() {
 }
 
 VOID Gina::DisconnectNotify() {
+}
+
+void Gina::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::LoginResponse * response) {
+    pService_->Auth(request, response);
+    if (response->Result != Utils::Protocol::LoginResponse::AuthSuccess) {
+        std::wstring msg;
+        switch (response->Result) {
+            case Utils::Protocol::LoginResponse::AuthFailed:
+                msg = L"ERROR: 授权失败";
+                break;
+
+            case Utils::Protocol::LoginResponse::UserCancel:
+                msg = L"ERROR: 用户取消";
+                break;
+
+            case Utils::Protocol::LoginResponse::Timeout:
+                msg = L"ERROR: 授权超时";
+                break;
+
+            case Utils::Protocol::LoginResponse::ConnectFailed:
+                msg = L"ERROR: 连接失败";
+                break;
+
+            default:
+                msg = L"ERROR: 未知错误，请联系管理员";
+                break;
+        }
+        pWinlogon_->WlxMessageBox(NULL, const_cast<LPWSTR>(msg.c_str()), L"Logon Message", MB_ICONEXCLAMATION);
+    }
 }

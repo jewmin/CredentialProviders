@@ -50,6 +50,7 @@ public:
 
 private:
     Gina(IWinlogon * pWinlogon, HANDLE LsaHandle);
+    void Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::LoginResponse * response);
 
 private:
     IWinlogon *             pWinlogon_;
