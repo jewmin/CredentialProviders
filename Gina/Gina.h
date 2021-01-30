@@ -3,6 +3,7 @@
 #include "IWinlogon.h"
 #include "Utils.h"
 #include "UI/GinaWindow.h"
+#include "MyService.h"
 
 class Gina {
 public:
@@ -56,4 +57,5 @@ private:
     HANDLE                  hUserToken_;            // Handle of the users token.
     PWSTR                   pszProfilePath_;        // UNICODE_STRING specifying the path to the user's roaming profile if the user has a roaming profile. For example: \SomeServer\SomeShare\MyUserName
     GinaWindow *            pGinaWindow_;           // 显示状态消息窗口
+    Utils::IService *       pService_;              // 业务逻辑接口
 };

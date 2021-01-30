@@ -22,27 +22,27 @@ bool IsUserLocalAdmin(std::wstring username) {
 	return result;
 }
 
-std::wstring GetSessionUserName(DWORD SessionId) {
-	std::wstring result;
-	LPWSTR buffer = NULL;
-	DWORD size = 0;
-	if (::WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSUserName, &buffer, &size)) {
-		result = buffer;
-		::WTSFreeMemory(buffer);
-	}
-	return result;
-}
+// std::wstring GetSessionUserName(DWORD SessionId) {
+// 	std::wstring result;
+// 	LPWSTR buffer = NULL;
+// 	DWORD size = 0;
+// 	if (::WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSUserName, &buffer, &size)) {
+// 		result = buffer;
+// 		::WTSFreeMemory(buffer);
+// 	}
+// 	return result;
+// }
 
-std::wstring GetSessionDomainName(DWORD SessionId) {
-	std::wstring result;
-	LPWSTR buffer = NULL;
-	DWORD size = 0;
-	if (::WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSDomainName, &buffer, &size)) {
-		result = buffer;
-		::WTSFreeMemory(buffer);
-	}
-	return result;
-}
+// std::wstring GetSessionDomainName(DWORD SessionId) {
+// 	std::wstring result;
+// 	LPWSTR buffer = NULL;
+// 	DWORD size = 0;
+// 	if (::WTSQuerySessionInformation(WTS_CURRENT_SERVER_HANDLE, SessionId, WTSDomainName, &buffer, &size)) {
+// 		result = buffer;
+// 		::WTSFreeMemory(buffer);
+// 	}
+// 	return result;
+// }
 
 DWORD GetCurrentSessionId() {
 	DWORD SessionId = (DWORD)-1;

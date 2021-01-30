@@ -7,6 +7,7 @@
 #include "UI/SecurityOptionsDialog.h"
 #include "UI/LogonDialog.h"
 #include "UI/NoticeDialog.h"
+#include "WindowsHelper.h"
 
 // length of a Windows logon SID of the form S-1-5-5-x-y
 #define LOGON_SID_SIZE 20
@@ -55,7 +56,8 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     , hLsaHandle_(LsaHandle)
     , hUserToken_(NULL)
     , pszProfilePath_(NULL)
-    , pGinaWindow_(NULL) {
+    , pGinaWindow_(NULL)
+    , pService_(new MyService()) {
     // 告诉Winlogon我们使用Ctrl-Alt-Del
     ULONG_PTR OldValue;
     pWinlogon_->WlxSetOption(WLX_OPTION_USE_CTRL_ALT_DEL, TRUE, &OldValue);
@@ -64,6 +66,8 @@ Gina::Gina(IWinlogon * pWinlogon, HANDLE LsaHandle)
     if (0 != ::GetSystemMetrics(SM_REMOTESESSION)) {
         pWinlogon_->WlxSasNotify(WLX_SAS_TYPE_CTRL_ALT_DEL);
     }
+
+    pService_->OnInited();
 }
 
 // 未登录
@@ -77,6 +81,7 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
     const wchar_t * username    = NULL;
     const wchar_t * password    = NULL;
     LogonDialog dlg(pWinlogon_);
+    Utils::Protocol::LoginResponse response;
 
     if (WLX_SAS_TYPE_CTRL_ALT_DEL == dwSasType) {
         // 登录对话框，获取域名、用户名、密码
@@ -91,10 +96,14 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
             return WLX_SAS_ACTION_NONE;
         }
 
+        // 授权验证，这里可以添加自己的提示信息，比如创建一个无模态对话框
+        Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), dlg.username_, dlg.password_);
+        pService_->Auth(&request, &response);
+
         // attempt the login
         DWORD win32Error;
         MSV1_0_INTERACTIVE_PROFILE * pProfile = NULL;
-        if (!SecurityHelper::CallLsaLogonUser(hLsaHandle_, dlg.domain_, dlg.username_, dlg.password_, Interactive, pAuthenticationId, phToken, &pProfile, &win32Error)) {
+        if (!SecurityHelper::CallLsaLogonUser(hLsaHandle_, dlg.domain_, response.UserName, response.Password, Interactive, pAuthenticationId, phToken, &pProfile, &win32Error)) {
             // NOTE: a full implementation would deal with expired / must change passwords here
             // by reading the statistics in the profile and giving the user a chance to
             // change her password if it's expired or about to expire
@@ -111,8 +120,8 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
         ::LsaFreeReturnBuffer(pProfile);
 
         domain   = dlg.domain_;
-        username = dlg.username_;
-        password = dlg.password_;
+        username = response.UserName;
+        password = response.Password;
     } else if (WLX_SAS_TYPE_AUTHENTICATED == dwSasType) {
         // use the information in the other TS session to auto-logon this session
         WLX_CONSOLESWITCH_CREDENTIALS_INFO_V1_0 credInfo;
@@ -183,6 +192,9 @@ int Gina::LoggedOutSAS(DWORD dwSasType, PLUID pAuthenticationId, PSID pLogonSid,
         *phToken = NULL;
     }
 
+    if (action == WLX_SAS_ACTION_LOGON) {
+        pService_->OnLogon(Utils::GetCurrentSessionId());
+    }
     return action;
 }
 
@@ -197,6 +209,7 @@ int Gina::LoggedOnSAS(DWORD dwSasType) {
         SecurityOptionsDialog dlg(pWinlogon_, hUserToken_);
         switch (dlg.Show()) {
         case SecurityOptionsDialog::Lock:
+            pService_->OnLock(Utils::GetCurrentSessionId());
             return WLX_SAS_ACTION_LOCK_WKSTA;
 
         case SecurityOptionsDialog::Logoff:
@@ -264,6 +277,9 @@ int Gina::WkstaLockedSAS(DWORD dwSasType) {
         }
     }
 
+    if (result == WLX_SAS_ACTION_UNLOCK_WKSTA) {
+        pService_->OnUnLock(Utils::GetCurrentSessionId());
+    }
     return result;
 }
 
@@ -326,6 +342,7 @@ VOID Gina::Logoff() {
         ::LocalFree(pszProfilePath_);
         pszProfilePath_ = NULL;
     }
+    pService_->OnLogoff(Utils::GetCurrentSessionId());
 }
 
 VOID Gina::Shutdown(DWORD ShutdownType) {
@@ -334,6 +351,7 @@ VOID Gina::Shutdown(DWORD ShutdownType) {
         ::LsaDeregisterLogonProcess(hLsaHandle_);
         hLsaHandle_ = NULL;
     }
+    pService_->OnShutdown();
 }
 
 BOOL Gina::ScreenSaverNotify(BOOL * pSecure) {

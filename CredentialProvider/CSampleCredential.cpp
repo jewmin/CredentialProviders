@@ -640,9 +640,9 @@ HRESULT CSampleCredential::ReportResult(
     __out CREDENTIAL_PROVIDER_STATUS_ICON* pcpsiOptionalStatusIcon
     )
 {
-	DWORD sessionid = Utils::GetCurrentSessionId();
+	// DWORD sessionid = Utils::GetCurrentSessionId();
 	Utils::Output(Utils::StringFormat(L"CSampleCredential::ReportResult ntsStatus: %d, ntsSubstatus: %d", ntsStatus, ntsSubstatus));
-	Utils::Output(Utils::StringFormat(L"CSampleCredential::ReportResult SessionId: %u, DomainName: %s, UserName: %s, MachineName: %s", sessionid, Utils::GetSessionDomainName(sessionid).c_str(), Utils::GetSessionUserName(sessionid).c_str(), Utils::GetMachineName().c_str()));
+	// Utils::Output(Utils::StringFormat(L"CSampleCredential::ReportResult SessionId: %u, DomainName: %s, UserName: %s, MachineName: %s", sessionid, Utils::GetSessionDomainName(sessionid).c_str(), Utils::GetSessionUserName(sessionid).c_str(), Utils::GetMachineName().c_str()));
     *ppwszOptionalStatusText = NULL;
     *pcpsiOptionalStatusIcon = CPSI_NONE;
 

@@ -28,19 +28,19 @@ public:
 		, LoginTime(rhs.LoginTime) {
 	}
 
-	SessionProperties(SessionProperties && rhs)
-		: SessionID(rhs.SessionID)
-		, UserName(std::move(rhs.UserName))
-		, Password(std::move(rhs.Password))
-		, LoginTime(rhs.LoginTime) {
-	}
+	// SessionProperties(SessionProperties && rhs)
+	// 	: SessionID(rhs.SessionID)
+	// 	, UserName(std::move(rhs.UserName))
+	// 	, Password(std::move(rhs.Password))
+	// 	, LoginTime(rhs.LoginTime) {
+	// }
 
 	~SessionProperties() {
 	}
 
 	std::wstring ToString() const;
 	SessionProperties & operator=(const SessionProperties & rhs);
-	SessionProperties & operator=(SessionProperties && rhs);
+	// SessionProperties & operator=(SessionProperties && rhs);
 
 	bool operator==(const SessionProperties & rhs) const;
 	bool operator!=(const SessionProperties & rhs) const;
@@ -73,14 +73,14 @@ inline SessionProperties & SessionProperties::operator=(const SessionProperties 
 	return *this;
 }
 
-inline SessionProperties & SessionProperties::operator=(SessionProperties && rhs) {
-	if (this != &rhs) {
-		SessionID = rhs.SessionID;
-		UserName = std::move(rhs.UserName);
-		Password = std::move(rhs.Password);
-	}
-	return *this;
-}
+// inline SessionProperties & SessionProperties::operator=(SessionProperties && rhs) {
+// 	if (this != &rhs) {
+// 		SessionID = rhs.SessionID;
+// 		UserName = std::move(rhs.UserName);
+// 		Password = std::move(rhs.Password);
+// 	}
+// 	return *this;
+// }
 
 inline bool SessionProperties::operator==(const SessionProperties & rhs) const {
 	return SessionID == rhs.SessionID;
