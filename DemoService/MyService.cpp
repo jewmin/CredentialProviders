@@ -24,6 +24,7 @@ void MyService::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::L
 	wcscpy_s(response->UserName, request->UserName);
 	wcscpy_s(response->Password, request->Password);
 	static WORD testResult = Utils::Protocol::LoginResponse::Unknown;
+	// 测试授权结果，6个结果
 	response->Result = testResult++ % 6;
 
 	if (response->Result == Utils::Protocol::LoginResponse::AuthSuccess) {

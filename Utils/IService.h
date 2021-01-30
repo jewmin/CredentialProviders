@@ -6,6 +6,7 @@
 
 namespace Utils {
 
+// 业务逻辑需要重写的接口类
 class IService {
 public:
 	// 初始化回调

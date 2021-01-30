@@ -14,6 +14,7 @@
 #pragma once
 #include <helpers.h>
 
+// 界面上新增控件，在这里添加
 // The indexes of each of the fields in our credential provider's tiles. Note that we're
 // using each of the nine available field types here.
 enum SAMPLE_FIELD_ID 
@@ -44,6 +45,7 @@ struct FIELD_STATE_PAIR
 // want to set up a credential with various combinations of field state pairs 
 // and field descriptors.
 
+// 这里添加控制显示状态
 // The field state value indicates whether the field is displayed
 // in the selected tile, the deselected tile, or both.
 // The Field interactive state indicates when 
@@ -62,6 +64,7 @@ static const FIELD_STATE_PAIR s_rgFieldStatePairs[] =
 	{ CPFS_HIDDEN, CPFIS_NONE},                             // SFI_FAILURE_TEXT
 };
 
+// 这里添加控制类型
 // Field descriptors for unlock and logon.
 // The first field is the index of the field.
 // The second is the type of the field.

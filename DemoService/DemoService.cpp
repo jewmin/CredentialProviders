@@ -18,7 +18,9 @@ CDemoService::~CDemoService() {
 }
 
 void CDemoService::RunService() {
+	// 无限循环
 	EventPoll();
+	// 释放资源
 	EventStopped();
 }
 
@@ -27,11 +29,13 @@ void CDemoService::OnStart(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors
 	if (service_) {
 		service_->OnInited();
 	}
+	// 管道监听
 	EventInitServer();
 }
 
 void CDemoService::OnStop() {
 	Utils::Output(L"Stopping Service");
+	// 停止循环
 	EventStop();
 }
 
@@ -79,7 +83,9 @@ void CDemoService::ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buf
 	case Utils::Protocol::Commond::RequestLogin:
 		Utils::Protocol::LoginRequest * request = reinterpret_cast<Utils::Protocol::LoginRequest *>(const_cast<BYTE *>(data + Utils::Protocol::Commond::CmdHeaderLen));
 		Utils::Protocol::LoginResponse response;
+		// 授权验证
 		service_->Auth(request, &response);
+		// 返回授权结果
 		Write(pipe, Utils::Protocol::Commond::ResponseLogin, reinterpret_cast<BYTE *>(&response), sizeof(response));
 		break;
 	}

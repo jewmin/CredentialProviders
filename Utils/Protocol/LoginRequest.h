@@ -6,9 +6,13 @@ namespace Utils {
 
 namespace Protocol {
 
+// 授权请求协议
 struct LoginRequest {
+	// 会话
 	DWORD SessionID;
+	// 授权用户名
 	wchar_t UserName[128];
+	// 授权密码
 	wchar_t Password[128];
 
 	LoginRequest()

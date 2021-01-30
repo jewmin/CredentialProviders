@@ -4,6 +4,7 @@
 
 namespace Utils {
 
+// 临界区互斥锁、线程安全
 class CCriticalSection {
 public:
 	class Owner {

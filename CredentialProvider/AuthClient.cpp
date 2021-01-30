@@ -25,9 +25,11 @@ void AuthClient::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::
 		pqcws_->SetStatusMessage(Utils::StringFormat(L"用户[%s]授权验证中...", request->UserName).c_str());
 	}
 
+	// 初始化管道
 	memcpy(&request_, request, sizeof(Utils::Protocol::LoginRequest));
 	EventInitClient();
 
+	// 5秒超时
 	HRESULT hr;
 	DWORD count = timeout_ / 16;
 	while (count-- > 0 && response_.Result == Utils::Protocol::LoginResponse::Unknown) {
@@ -38,12 +40,15 @@ void AuthClient::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::
 				break;
 			}
 		}
+		// 不等待模式跑事件循环
 		EventPoll(UV_RUN_NOWAIT);
 		Sleep(16);
 	}
+	// 事件循环结束
 	EventStop();
 	EventStopped();
 
+	// 设置授权结果
 	if (response_.Result == Utils::Protocol::LoginResponse::Unknown) {
 		response_.Result = Utils::Protocol::LoginResponse::Timeout;
 	}

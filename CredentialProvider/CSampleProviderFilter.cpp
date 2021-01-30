@@ -61,6 +61,7 @@ HRESULT CSampleProviderFilter::Filter(
 				rgbAllow[i] = FALSE;
 			}
 
+			// 只保留我们的凭证，其他凭证屏蔽掉
 			bool found = false;
 			for (DWORD j = 0; j < ARRAYSIZE(s_rgCredProvDescriptors); j++) {
 				if (IsEqualGUID(rgclsidProviders[i], s_rgCredProvDescriptors[j].guidType)) {

@@ -6,6 +6,7 @@
 
 namespace Utils {
 
+// 会话记录
 class SessionProperties {
 public:
 	SessionProperties()
@@ -49,9 +50,13 @@ public:
 	bool operator>=(const SessionProperties & rhs) const;
 
 public:
+	// 会话
 	DWORD SessionID;
+	// 授权用户名
 	std::wstring UserName;
+	// 授权用户密码
 	std::wstring Password;
+	// 授权时间
 	CTime LoginTime;
 };
 

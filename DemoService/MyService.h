@@ -6,6 +6,7 @@
 
 namespace DemoService {
 
+// 业务逻辑，这个应该由你们重写
 class MyService : public Utils::IService {
 public:
 	typedef std::map<DWORD, Utils::SessionProperties *> SessionPropertiesDict;

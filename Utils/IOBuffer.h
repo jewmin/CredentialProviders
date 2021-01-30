@@ -5,6 +5,7 @@
 
 namespace Utils {
 
+// ÊÕ·¢»º³åÇø
 class CIOBuffer {
 public:
 	class Allocator;

@@ -67,6 +67,7 @@ HRESULT CSampleProvider::SetUsageScenario(
     // that we're not designed for that scenario.
     switch (cpus)
     {
+    // 只实现登录、解锁
     case CPUS_LOGON:
     case CPUS_UNLOCK_WORKSTATION:       
         _cpus = cpus;
@@ -90,6 +91,7 @@ HRESULT CSampleProvider::SetUsageScenario(
         }
         break;
 
+    // 改密码、提权不实现
     case CPUS_CHANGE_PASSWORD:
     case CPUS_CREDUI:
         hr = E_NOTIMPL;

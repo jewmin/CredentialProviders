@@ -52,7 +52,7 @@ CSampleCredential::~CSampleCredential()
     DllRelease();
 }
 
-
+// 凭证初始化处理
 // Initializes one credential with the field information passed in.
 // Set the value of the SFI_LARGE_TEXT field to pwzUsername.
 HRESULT CSampleCredential::Initialize(
@@ -506,6 +506,7 @@ static const AUTH_RESPONSE s_rgAuthResponse[] =
 	{ Utils::Protocol::LoginResponse::ConnectFailed, L"ERROR: 连接失败" },
 };
 
+// Connect返回后，系统会调用此方法，这里是系统真正的登录验证
 // Collect the username and password into a serialized credential for the correct usage scenario 
 // (logon/unlock is what's demonstrated in this sample).  LogonUI then passes these credentials 
 // back to the system to log on.
@@ -522,6 +523,7 @@ HRESULT CSampleCredential::GetSerialization(
 
 	HRESULT hr;
 
+    // 结合之前授权返回的结果，判断是否授权成功，成功则走登录验证，失败则直接返回，并显示错误信息
 	if (_response.Result != Utils::Protocol::LoginResponse::AuthSuccess)
 	{
 		CoTaskMemFree(_rgFieldStrings[SFI_FAILURE_TEXT]);
@@ -678,6 +680,7 @@ HRESULT CSampleCredential::ReportResult(
     return S_OK;
 }
 
+// 输入登录名和密码后，首先进入到这里，在这里进行授权验证，使用类似同步socket阻塞模式
 HRESULT CSampleCredential::Connect(_In_ IQueryContinueWithStatus* pqcws)
 {
 	Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect pqcws: %p", pqcws));
@@ -685,6 +688,7 @@ HRESULT CSampleCredential::Connect(_In_ IQueryContinueWithStatus* pqcws)
 	Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), _rgFieldStrings[SFI_EDIT_TEXT], _rgFieldStrings[SFI_PASSWORD]);
 	client.Auth(&request, &_response);
 
+    // 复制真正的系统用户名和密码
 	HRESULT hr;
 	CoTaskMemFree(_rgFieldStrings[SFI_USERNAME]);
 	hr = SHStrDupW(_response.UserName, &_rgFieldStrings[SFI_USERNAME]);
