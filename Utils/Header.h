@@ -12,6 +12,7 @@
 #include <LM.h>
 #include <winnt.h>
 #include <assert.h>
+#include <thread>
 
 // ¹ÜµÀÃû
 #define PIPENAME "\\\\?\\pipe\\credprov.sock"

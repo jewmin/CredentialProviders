@@ -50,6 +50,8 @@
 		"xutility": "cpp",
 		"hash_set": "cpp",
 		"set": "cpp",
-		"strstream": "cpp"
+		"strstream": "cpp",
+		"thread": "cpp",
+		"chrono": "cpp"
 	}
 }

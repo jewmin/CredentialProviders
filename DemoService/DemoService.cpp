@@ -9,6 +9,7 @@ CDemoService::CDemoService(const std::wstring & service_name)
 	: Utils::CServiceBase(service_name), service_(new MyService()) {
 	can_shutdown_ = true;
 	can_handle_session_change_event_ = true;
+	can_handle_power_event_ = true;
 }
 
 CDemoService::~CDemoService() {
