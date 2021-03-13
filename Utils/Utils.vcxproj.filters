@@ -42,6 +42,9 @@
     <ClCompile Include="UvHandler.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="Thread.cc">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileLog.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="Protocol\LoginResponse.h">
       <Filter>头文件\Protocol</Filter>
+    </ClInclude>
+    <ClInclude Include="Thread.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

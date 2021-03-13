@@ -135,6 +135,7 @@
     <ClCompile Include="FileLog.cpp" />
     <ClCompile Include="IOBuffer.cpp" />
     <ClCompile Include="ServiceBase.cpp" />
+    <ClCompile Include="Thread.cc" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="UvHandler.cpp" />
     <ClCompile Include="WindowsHelper.cpp" />
@@ -152,6 +153,7 @@
     <ClInclude Include="Protocol\LoginResponse.h" />
     <ClInclude Include="ServiceBase.h" />
     <ClInclude Include="SessionProperties.h" />
+    <ClInclude Include="Thread.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="UvHandler.h" />
     <ClInclude Include="WindowsHelper.h" />
