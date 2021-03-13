@@ -1,58 +1,50 @@
 #include "AuthClient.h"
 #include "Utils.h"
+#include "CSampleProvider.h"
 
-AuthClient::AuthClient(DWORD timeout, IQueryContinueWithStatus* pqcws)
+AuthClient::AuthClient(int timeout)
 	: timeout_(timeout)
-	, pqcws_(NULL) {
-	Utils::Output(Utils::StringFormat(L"AuthClient::AuthClient timeout: %u, pqcws: %p", timeout, pqcws));
-	if (pqcws) {
-		pqcws_ = pqcws;
-		pqcws_->AddRef();
-	}
+	, pipe_(NULL)
+	, pProvider_(NULL) {
+	Utils::Output(Utils::StringFormat(L"AuthClient::AuthClient timeout: %d", timeout));
+	uv_timer_init(&event_loop_, &reconnect_timer_);
+	reconnect_timer_.data = this;
+	uv_async_init(&event_loop_, &queue_notify_, AuthClient::AsyncCb);
+	queue_notify_.data = this;
 }
 
 AuthClient::~AuthClient() {
 	Utils::Output(L"AuthClient::~AuthClient");
-	if (pqcws_) {
-		pqcws_->Release();
-		pqcws_ = NULL;
+	// We'll also make sure to release any reference we have to the provider.
+	if (pProvider_ != NULL) {
+		pProvider_->Release();
+		pProvider_ = NULL;
 	}
+	EventStop();
 }
 
-void AuthClient::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::LoginResponse * response) {
-	Utils::Output(Utils::StringFormat(L"AuthClient::Auth request: %p, response: %p", request, response));
-	if (pqcws_) {
-		pqcws_->SetStatusMessage(Utils::StringFormat(L"用户[%s]授权验证中...", request->UserName).c_str());
-	}
+HRESULT AuthClient::Initialize(CSampleProvider * pProvider) {
+	Utils::Output(Utils::StringFormat(L"AuthClient::Initialize pProvider: %p", pProvider));
+	HRESULT hr = S_OK;
 
-	// 初始化管道
-	memcpy(&request_, request, sizeof(Utils::Protocol::LoginRequest));
-	EventInitClient();
-
-	// 5秒超时
-	HRESULT hr;
-	DWORD count = timeout_ / 16;
-	while (count-- > 0 && response_.Result == Utils::Protocol::LoginResponse::Unknown) {
-		if (pqcws_) {
-			hr = pqcws_->QueryContinue();
-			if (!SUCCEEDED(hr)) {
-				response_.Result = Utils::Protocol::LoginResponse::UserCancel;
-				break;
-			}
-		}
-		// 不等待模式跑事件循环
-		EventPoll(UV_RUN_NOWAIT);
-		Sleep(16);
+	// Be sure to add a release any existing provider we might have, then add a reference
+	// to the provider we're working with now.
+	if (pProvider_ != NULL) {
+		pProvider_->Release();
 	}
-	// 事件循环结束
-	EventStop();
-	EventStopped();
+	pProvider_ = pProvider;
+	pProvider_->AddRef();
 
-	// 设置授权结果
-	if (response_.Result == Utils::Protocol::LoginResponse::Unknown) {
-		response_.Result = Utils::Protocol::LoginResponse::Timeout;
-	}
-	memcpy(response, &response_, sizeof(Utils::Protocol::LoginResponse));
+	Start();
+
+	return hr;
+}
+
+void AuthClient::Auth(Utils::Protocol::LoginRequest * request) {
+	Utils::Output(Utils::StringFormat(L"AuthClient::Auth request: %p", request));
+	Utils::CCriticalSection::Owner lock(cs_);
+	request_queue_.push_back(*request);
+	uv_async_send(&queue_notify_);
 }
 
 void AuthClient::ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buffer) {
@@ -62,9 +54,23 @@ void AuthClient::ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buffe
 	Utils::Protocol::CmdHeader ch = { 0 };
 	memcpy(&ch, data, Utils::Protocol::Commond::CmdHeaderLen);
 	switch (ch.wCmd) {
+	// 密码登录
 	case Utils::Protocol::Commond::ResponseLogin:
-		Utils::Protocol::LoginResponse * response = reinterpret_cast<Utils::Protocol::LoginResponse *>(const_cast<BYTE *>(data + Utils::Protocol::Commond::CmdHeaderLen));
-		memcpy(&response_, response, sizeof(Utils::Protocol::LoginResponse));
+		{
+			Utils::Protocol::LoginResponse * response = reinterpret_cast<Utils::Protocol::LoginResponse *>(const_cast<BYTE *>(data + Utils::Protocol::Commond::CmdHeaderLen));
+			// 序号必须一样
+			if (response->Sn == last_request_.Sn) {
+				pProvider_->OnResponse(true, response);
+			}
+		}
+		break;
+
+	// 扫码登录
+	case Utils::Protocol::Commond::ResponseQCLogin:
+		{
+			Utils::Protocol::LoginResponse * response = reinterpret_cast<Utils::Protocol::LoginResponse *>(const_cast<BYTE *>(data + Utils::Protocol::Commond::CmdHeaderLen));
+			pProvider_->OnResponse(false, response);
+		}
 		break;
 	}
 }
@@ -72,8 +78,50 @@ void AuthClient::ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buffe
 void AuthClient::OnConnected(uv_pipe_t * pipe, bool status) {
 	Utils::Output(Utils::StringFormat(L"AuthClient::OnConnected pipe: %p, status: %s", pipe, status ? L"true" : L"false"));
 	if (status) {
-		Write(pipe, Utils::Protocol::Commond::RequestLogin, reinterpret_cast<BYTE *>(&request_), sizeof(request_));
+		pipe_ = pipe;
 	} else {
-		response_.Result = Utils::Protocol::LoginResponse::ConnectFailed;
+		pipe_ = NULL;
+		uv_timer_start(&reconnect_timer_, AuthClient::TimerCb, timeout_, 0);  // 断线重连
 	}
+}
+
+void AuthClient::OnDisconnected(uv_pipe_t * pipe) {
+	Utils::Output(Utils::StringFormat(L"AuthClient::OnDisconnected pipe: %p", pipe));
+	pipe_ = NULL;
+	uv_timer_start(&reconnect_timer_, AuthClient::TimerCb, timeout_, 0);  // 断线重连
+}
+
+void AuthClient::OnRountine() {
+	Utils::Output(L"AuthClient::OnRountine");
+	EventInitClient();
+	EventPoll();
+	EventStopped();
+}
+
+void AuthClient::SendAuth() {
+	// 只发送最后一个请求
+	Utils::CCriticalSection::Owner lock(cs_);
+	if (request_queue_.size() > 0) {
+		Utils::Protocol::LoginRequest & request = request_queue_.back();
+		memcpy(&last_request_, &request, sizeof(Utils::Protocol::LoginRequest));
+		int status = Write(pipe_, Utils::Protocol::Commond::RequestLogin, reinterpret_cast<BYTE *>(&last_request_), sizeof(last_request_));
+		if (status < 0) {
+			Utils::Protocol::LoginResponse response;
+			response.Result = Utils::Protocol::LoginResponse::AuthFailed;
+			pProvider_->OnResponse(true, &response);
+		}
+		request_queue_.clear();
+	}
+}
+
+void AuthClient::TimerCb(uv_timer_t* handle) {
+	Utils::Output(Utils::StringFormat(L"AuthClient::TimerCb handle: %p", handle));
+	AuthClient * client = static_cast<AuthClient *>(handle->data);
+	client->StartConnectPipe();
+}
+
+void AuthClient::AsyncCb(uv_async_t* handle) {
+	Utils::Output(Utils::StringFormat(L"AuthClient::AsyncCb handle: %p", handle));
+	AuthClient * client = static_cast<AuthClient *>(handle->data);
+	client->SendAuth();
 }

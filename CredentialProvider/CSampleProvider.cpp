@@ -15,7 +15,6 @@
 #include <credentialprovider.h>
 #include <propkey.h>
 #include "CSampleProvider.h"
-#include "CSampleCredential.h"
 #include "guid.h"
 #include "Utils.h"
 #include "WindowsHelper.h"
@@ -23,10 +22,12 @@
 // CSampleProvider ////////////////////////////////////////////////////////
 
 CSampleProvider::CSampleProvider():
-    _cRef(1)
+    _cRef(1), _bPassLogin(true), _CurrentSn(1), _lastLoginResult(Utils::Protocol::LoginResponse::Unknown)
 {
     DllAddRef();
 
+    _pcpe = NULL;
+    _pAuthClient = NULL;
     _pCredential = NULL;
 	_pCredProviderUserArray = NULL;
 
@@ -39,6 +40,11 @@ CSampleProvider::~CSampleProvider()
     {
         _pCredential->Release();
         _pCredential = NULL;
+    }
+
+    if (_pAuthClient != NULL)
+    {
+        delete _pAuthClient;
     }
 
 	if (_pCredProviderUserArray != NULL)
@@ -72,22 +78,51 @@ HRESULT CSampleProvider::SetUsageScenario(
     case CPUS_UNLOCK_WORKSTATION:       
         _cpus = cpus;
 
-        // Create and initialize our credential.
-        // A more advanced credprov might only enumerate tiles for the user whose owns the locked
-        // session, since those are the only creds that wil work
-        _pCredential = new CSampleCredential();
-        if (_pCredential != NULL)
+        if (!_pCredential && !_pAuthClient)
         {
-            hr = _pCredential->Initialize(_cpus, s_rgCredProvFieldDescriptors, s_rgFieldStatePairs);
+            // Create and initialize our credential.
+            // A more advanced credprov might only enumerate tiles for the user whose owns the locked
+            // session, since those are the only creds that wil work
+            _pCredential = new CSampleCredential();
+            if (_pCredential != NULL)
+            {
+                _pAuthClient = new AuthClient(3000);
+                if (_pAuthClient != NULL)
+                {
+                    hr = _pAuthClient->Initialize(this);
+                    if (SUCCEEDED(hr))
+                    {
+                        hr = _pCredential->Initialize(_cpus, s_rgCredProvFieldDescriptors, s_rgFieldStatePairs, this);
+                    }
+                }
+                else
+                {
+                    hr = E_OUTOFMEMORY;
+                }
+            }
+            else
+            {
+                hr = E_OUTOFMEMORY;
+            }
+            // If anything failed, clean up.
             if (FAILED(hr))
             {
-                _pCredential->Release();
-                _pCredential = NULL;
+                if (_pAuthClient != NULL)
+                {
+                    delete _pAuthClient;
+                    _pAuthClient = NULL;
+                }
+                if (_pCredential != NULL)
+                {
+                    _pCredential->Release();
+                    _pCredential = NULL;
+                }
             }
         }
         else
         {
-            hr = E_OUTOFMEMORY;
+            // everything's already all set up
+            hr = S_OK;
         }
         break;
 
@@ -140,17 +175,26 @@ HRESULT CSampleProvider::Advise(
     )
 {
 	Utils::Output(Utils::StringFormat(L"CSampleProvider::Advise pcpe: %p, upAdviseContext: %llu", pcpe, upAdviseContext));
-    UNREFERENCED_PARAMETER(pcpe);
-    UNREFERENCED_PARAMETER(upAdviseContext);
-
-    return E_NOTIMPL;
+    if (_pcpe != NULL)
+    {
+        _pcpe->Release();
+    }
+    _pcpe = pcpe;
+    _pcpe->AddRef();
+    _upAdviseContext = upAdviseContext;
+    return S_OK;
 }
 
 // Called by LogonUI when the ICredentialProviderEvents callback is no longer valid.
 HRESULT CSampleProvider::UnAdvise()
 {
 	Utils::Output(L"CSampleProvider::UnAdvise");
-    return E_NOTIMPL;
+    if (_pcpe != NULL)
+    {
+        _pcpe->Release();
+        _pcpe = NULL;
+    }
+    return S_OK;
 }
 
 // Called by LogonUI to determine the number of fields in your tiles.  This
@@ -277,6 +321,26 @@ HRESULT CSampleProvider::_EnumerateCredentials()
 		}
 	}
 	return hr;
+}
+
+void CSampleProvider::Request(Utils::Protocol::LoginRequest * request) {
+    _lastLoginResult = Utils::Protocol::LoginResponse::Unknown;
+    request->Sn = _CurrentSn++;
+    _pAuthClient->Auth(request);
+}
+
+void CSampleProvider::OnResponse(bool bPassLogin, Utils::Protocol::LoginResponse * response) {
+    _bPassLogin = bPassLogin;
+    {
+        // ¼ÓËø
+        Utils::CCriticalSection::Owner lock(_cs);
+        memcpy(&_lastLoginResponse, response, sizeof(Utils::Protocol::LoginResponse));
+        _lastLoginResult = _lastLoginResponse.Result;
+    }
+    if (!_bPassLogin && _pcpe != NULL) {
+        // É¨ÂëµÇÂ¼²ÅÇÐ»»Æ¾Ö¤
+        _pcpe->CredentialsChanged(_upAdviseContext);
+    }
 }
 
 // Boilerplate code to create our provider.

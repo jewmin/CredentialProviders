@@ -53,7 +53,7 @@ void CFileLog::Output(const std::wstring & message) {
 		_snwprintf_s(time, sizeof(time), L"%04d-%02d-%02d %02d:%02d:%02d", now_time.Year, now_time.Month, now_time.Day, now_time.Hour, now_time.Minute, now_time.Second);
 
 		std::wstringstream msg;
-		msg << time << L" - " << GetCurrentProcessId() << L" - " << message << std::endl;
+		msg << time << L" - " << GetCurrentProcessId() << L" - " << GetCurrentThreadId() << L" - " << message << std::endl;
 		DWORD written;
 		std::string buf = Utils::WToA(msg.str());
 		::WriteFile(file_, buf.c_str(), static_cast<DWORD>(buf.length()), &written, NULL);

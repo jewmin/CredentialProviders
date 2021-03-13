@@ -6,10 +6,11 @@
 namespace DemoService {
 
 CDemoService::CDemoService(const std::wstring & service_name)
-	: Utils::CServiceBase(service_name), service_(new MyService()) {
+	: Utils::CServiceBase(service_name), service_(new MyService()), qc_pipe_(NULL) {
 	can_shutdown_ = true;
 	can_handle_session_change_event_ = true;
 	can_handle_power_event_ = true;
+	can_pause_and_continue_ = true;
 }
 
 CDemoService::~CDemoService() {
@@ -32,6 +33,23 @@ void CDemoService::OnStart(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors
 	}
 	// ¹ÜµÀ¼àÌý
 	EventInitServer();
+}
+
+void CDemoService::OnContinue() {
+	// =============================== ²âÊÔ´úÂë£¬Çë×ÔÐÐÉ¾³ý£¬É¨ÂëµÇÂ¼ =================
+	static int times = 0;
+	Utils::Protocol::LoginResponse response_qc;
+	response_qc.Result = Utils::Protocol::LoginResponse::AuthSuccess;
+	wcscpy_s(response_qc.UserName, L"admin");
+	if (times++ % 2 == 0) {
+		wcscpy_s(response_qc.Password, L"test");
+		Utils::Output(L"²âÊÔÉ¨ÃèµÇÂ¼ admin/test");
+	} else {
+		wcscpy_s(response_qc.Password, L"admin");
+		Utils::Output(L"²âÊÔÉ¨ÃèµÇÂ¼ admin/admin");
+	}
+	Write(qc_pipe_, Utils::Protocol::Commond::ResponseQCLogin, reinterpret_cast<BYTE *>(&response_qc), sizeof(response_qc));
+	// ===========================================================================
 }
 
 void CDemoService::OnStop() {
@@ -88,6 +106,9 @@ void CDemoService::ProcessCommand(uv_pipe_t * pipe, const Utils::CIOBuffer * buf
 		service_->Auth(request, &response);
 		// ·µ»ØÊÚÈ¨½á¹û
 		Write(pipe, Utils::Protocol::Commond::ResponseLogin, reinterpret_cast<BYTE *>(&response), sizeof(response));
+		// =============================== ²âÊÔ´úÂë£¬Çë×ÔÐÐÉ¾³ý£¬É¨ÂëµÇÂ¼ =================
+		qc_pipe_ = pipe;
+		// ===========================================================================
 		break;
 	}
 }

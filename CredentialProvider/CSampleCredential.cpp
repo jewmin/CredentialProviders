@@ -18,12 +18,15 @@
 #include "guid.h"
 #include "Utils.h"
 #include "WindowsHelper.h"
+#include "CSampleProvider.h"
 
 // CSampleCredential ////////////////////////////////////////////////////////
 
 CSampleCredential::CSampleCredential():
     _cRef(1),
-    _pCredProvCredentialEvents(NULL)
+    _pCredProvCredentialEvents(NULL),
+    _pProvider(NULL),
+    _lastLoginResult(Utils::Protocol::LoginResponse::Unknown)
 {
 	Utils::Output(L"CSampleCredential::CSampleCredential");
     DllAddRef();
@@ -49,6 +52,11 @@ CSampleCredential::~CSampleCredential()
         CoTaskMemFree(_rgCredProvFieldDescriptors[i].pszLabel);
     }
 
+    if (_pProvider != NULL) {
+		_pProvider->Release();
+		_pProvider = NULL;
+	}
+
     DllRelease();
 }
 
@@ -58,13 +66,19 @@ CSampleCredential::~CSampleCredential()
 HRESULT CSampleCredential::Initialize(
     __in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,
     __in const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR* rgcpfd,
-    __in const FIELD_STATE_PAIR* rgfsp
+    __in const FIELD_STATE_PAIR* rgfsp,
+    __in CSampleProvider * pProvider
     )
 {
-	Utils::Output(Utils::StringFormat(L"CSampleCredential::Initialize cpus: %s", s_CPUS_Strings[cpus]));
+	Utils::Output(Utils::StringFormat(L"CSampleCredential::Initialize cpus: %s, pProvider: %p", s_CPUS_Strings[cpus], pProvider));
     HRESULT hr = S_OK;
 
     _cpus = cpus;
+    if (_pProvider != NULL) {
+		_pProvider->Release();
+	}
+	_pProvider = pProvider;
+	_pProvider->AddRef();
 
     // Copy the field descriptors for each field. This is useful if you want to vary the field
     // descriptors based on what Usage scenario the credential was created for.
@@ -154,7 +168,8 @@ HRESULT CSampleCredential::UnAdvise()
 // selected, you would do it here.
 HRESULT CSampleCredential::SetSelected(__out BOOL* pbAutoLogon)  
 {
-    *pbAutoLogon = FALSE;
+    // *pbAutoLogon = FALSE;
+    *pbAutoLogon = _pProvider->_bPassLogin ? FALSE : TRUE;
 	Utils::Output(Utils::StringFormat(L"CSampleCredential::SetSelected *pbAutoLogon: %s", *pbAutoLogon ? L"TRUE" : L"FALSE"));
     return S_OK;
 }
@@ -524,7 +539,7 @@ HRESULT CSampleCredential::GetSerialization(
 	HRESULT hr;
 
     // 结合之前授权返回的结果，判断是否授权成功，成功则走登录验证，失败则直接返回，并显示错误信息
-	if (_response.Result != Utils::Protocol::LoginResponse::AuthSuccess)
+	if (_lastLoginResult != Utils::Protocol::LoginResponse::AuthSuccess)
 	{
 		CoTaskMemFree(_rgFieldStrings[SFI_FAILURE_TEXT]);
 		hr = SHStrDupW(L"ERROR: 未知错误，请联系管理员", &_rgFieldStrings[SFI_FAILURE_TEXT]);
@@ -532,7 +547,7 @@ HRESULT CSampleCredential::GetSerialization(
 		{
 			for (DWORD i = 0; i < ARRAYSIZE(s_rgAuthResponse); i++)
 			{
-				if (s_rgAuthResponse[i].wResult == _response.Result)
+				if (s_rgAuthResponse[i].wResult == _lastLoginResult)
 				{
 					CoTaskMemFree(_rgFieldStrings[SFI_FAILURE_TEXT]);
 					hr = SHStrDupW(s_rgAuthResponse[i].pwzMessage, &_rgFieldStrings[SFI_FAILURE_TEXT]);
@@ -675,6 +690,9 @@ HRESULT CSampleCredential::ReportResult(
         }
     }
 
+    // 重置为密码登录
+    _pProvider->_bPassLogin = true;
+
     // Since NULL is a valid value for *ppwszOptionalStatusText and *pcpsiOptionalStatusIcon
     // this function can't fail.
     return S_OK;
@@ -684,19 +702,56 @@ HRESULT CSampleCredential::ReportResult(
 HRESULT CSampleCredential::Connect(_In_ IQueryContinueWithStatus* pqcws)
 {
 	Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect pqcws: %p", pqcws));
-	AuthClient client(5000, pqcws);
-	Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), _rgFieldStrings[SFI_EDIT_TEXT], _rgFieldStrings[SFI_PASSWORD]);
-	client.Auth(&request, &_response);
+    if (_pProvider->_bPassLogin)
+    {
+        Utils::Protocol::LoginRequest request(Utils::GetCurrentSessionId(), _rgFieldStrings[SFI_EDIT_TEXT], _rgFieldStrings[SFI_PASSWORD]);
+        _pProvider->Request(&request);
 
-    // 复制真正的系统用户名和密码
-	HRESULT hr;
-	CoTaskMemFree(_rgFieldStrings[SFI_USERNAME]);
-	hr = SHStrDupW(_response.UserName, &_rgFieldStrings[SFI_USERNAME]);
-	if (SUCCEEDED(hr))
-	{
-		CoTaskMemFree(_rgFieldStrings[SFI_PASSWORD]);
-		hr = SHStrDupW(_response.Password, &_rgFieldStrings[SFI_PASSWORD]);
-	}
+        if (pqcws) {
+            pqcws->SetStatusMessage(Utils::StringFormat(L"用户[%s]授权验证中...", _rgFieldStrings[SFI_EDIT_TEXT]).c_str());
+        }
+
+        // 5秒超时
+        _lastLoginResult = Utils::Protocol::LoginResponse::Timeout;
+        HRESULT hr;
+        DWORD count = 5000 / 16;
+        while (count-- > 0) {
+            // 检查是否收到响应
+            if (_pProvider->_lastLoginResult != Utils::Protocol::LoginResponse::Unknown) {
+                _lastLoginResult = _pProvider->_lastLoginResult;
+                break;
+            }
+            if (pqcws) {
+                hr = pqcws->QueryContinue();
+                if (!SUCCEEDED(hr)) {
+                    _lastLoginResult = Utils::Protocol::LoginResponse::UserCancel;
+                    break;
+                }
+            }
+            Sleep(16);
+        }
+        Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect 密码登录 %d", _lastLoginResult));
+    }
+    else
+    {
+        _lastLoginResult = _pProvider->_lastLoginResult;
+        Utils::Output(Utils::StringFormat(L"CSampleCredential::Connect 扫码登录 %d", _lastLoginResult));
+    }
+
+    if (_lastLoginResult == Utils::Protocol::LoginResponse::AuthSuccess)
+    {
+        // 复制真正的系统用户名和密码
+        Utils::CCriticalSection::Owner lock(_pProvider->_cs);
+
+        HRESULT hr;
+        CoTaskMemFree(_rgFieldStrings[SFI_USERNAME]);
+        hr = SHStrDupW(_pProvider->_lastLoginResponse.UserName, &_rgFieldStrings[SFI_USERNAME]);
+        if (SUCCEEDED(hr))
+        {
+            CoTaskMemFree(_rgFieldStrings[SFI_PASSWORD]);
+            hr = SHStrDupW(_pProvider->_lastLoginResponse.Password, &_rgFieldStrings[SFI_PASSWORD]);
+        }
+    }
 
 	return S_OK;
 }

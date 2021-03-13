@@ -17,9 +17,11 @@ protected:
 	// 写数据前处理，主要是用于处理协议头
 	void PreWrite(Utils::CIOBuffer * buffer, WORD wCmd);
 	// 管道异步写数据
-	void Write(uv_pipe_t * pipe, WORD wCmd, const BYTE * data, size_t len);
+	int Write(uv_pipe_t * pipe, WORD wCmd, const BYTE * data, size_t len);
 	// 管道连接成功后回调
 	virtual void OnConnected(uv_pipe_t * pipe, bool status);
+	// 管道断开连接后回调
+	virtual void OnDisconnected(uv_pipe_t * pipe);
 
 	// 这部分可以重写，实现协议分割
 	void ReadCompleted(uv_pipe_t * pipe, Utils::CIOBuffer * buffer);
@@ -39,6 +41,8 @@ protected:
 	void EventInitServer();
 	// 初始化事件循环并启动管道客户端连接
 	void EventInitClient();
+	// 管道客户端连接
+	void StartConnectPipe();
 
 	static uv_pipe_t * CreatePipe(uv_loop_t * loop);
 	static void ClosePipe(uv_pipe_t * handle);

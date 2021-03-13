@@ -23,6 +23,7 @@ void MyService::Auth(Utils::Protocol::LoginRequest * request, Utils::Protocol::L
 
 	wcscpy_s(response->UserName, request->UserName);
 	wcscpy_s(response->Password, request->Password);
+	response->Sn = request->Sn;
 	static WORD testResult = Utils::Protocol::LoginResponse::AuthFailed;
 	// 测试授权结果，6个结果
 	response->Result = testResult++ % 6;

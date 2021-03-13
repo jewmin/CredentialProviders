@@ -17,6 +17,7 @@ public:
 protected:
 	virtual void RunService();
 	virtual void OnStart(DWORD dwNumServicesArgs, LPWSTR * lpServiceArgVectors);
+	virtual void OnContinue();
 	virtual void OnStop();
 	virtual void OnShutdown();
 	virtual void OnSessionChange(DWORD dwEventType, PWTSSESSION_NOTIFICATION pNotification);
@@ -25,6 +26,9 @@ protected:
 
 private:
 	Utils::IService * service_;
+	// =============================== ²âÊÔ´úÂë£¬Çë×ÔÐÐÉ¾³ý£¬É¨ÂëµÇÂ¼ =================
+	uv_pipe_t * qc_pipe_;
+	// ===========================================================================
 };
 
 }

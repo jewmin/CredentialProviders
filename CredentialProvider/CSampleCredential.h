@@ -23,6 +23,7 @@
 #include "resource.h"
 #include "AuthClient.h"
 
+class CSampleProvider;
 class CSampleCredential : public IConnectableCredentialProviderCredential
 {
 public:
@@ -92,7 +93,8 @@ public:
   public:
     HRESULT Initialize(__in CREDENTIAL_PROVIDER_USAGE_SCENARIO cpus,
                        __in const CREDENTIAL_PROVIDER_FIELD_DESCRIPTOR* rgcpfd,
-                       __in const FIELD_STATE_PAIR* rgfsp);
+                       __in const FIELD_STATE_PAIR* rgfsp,
+                       __in CSampleProvider * pProvider);
     CSampleCredential();
 
     virtual ~CSampleCredential();
@@ -123,5 +125,6 @@ public:
 
     DWORD                                   _dwComboIndex;                                  // Tracks the current index 
                                                                                             // of our combobox.
-	Utils::Protocol::LoginResponse          _response;                                      // 授权验证响应
+    CSampleProvider *                       _pProvider;                                     // 凭证提供者
+    WORD                                    _lastLoginResult;                               // 最后登录响应结果
 };

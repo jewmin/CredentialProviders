@@ -18,12 +18,14 @@ struct LoginResponse {
 	// 授权结果
 	WORD Result;
 	// 真正系统用户名
-	wchar_t UserName[128];
+	wchar_t UserName[MAX_STRING_SIZE];
 	// 真正系统密码
-	wchar_t Password[128];
+	wchar_t Password[MAX_STRING_SIZE];
+	// 带回请求的序列号
+	int Sn;
 
 	LoginResponse()
-		: Result(Unknown) {
+		: Result(Unknown), Sn(0) {
 		wmemset(UserName, 0, sizeof(UserName) / sizeof(wchar_t));
 		wmemset(Password, 0, sizeof(Password) / sizeof(wchar_t));
 	}

@@ -6,6 +6,8 @@ namespace Utils {
 
 namespace Protocol {
 
+#define MAX_STRING_SIZE 128
+
 #pragma pack(1)
 
 // 协议头
@@ -25,6 +27,8 @@ public:
 	static const WORD RequestLogin = 1001;
 	// 授权请求响应
 	static const WORD ResponseLogin = 2001;
+	// 扫码授权请求响应
+	static const WORD ResponseQCLogin = 2002;
 	static const BYTE CmdBeginFlag = 0xBF;
 	static const BYTE CmdEndFlag = 0xEF;
 	static const size_t CmdHeaderLen = sizeof(CmdHeader);

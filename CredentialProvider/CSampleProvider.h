@@ -11,8 +11,10 @@
 #include <windows.h>
 #include <strsafe.h>
 
+#include "AuthClient.h"
 #include "CSampleCredential.h"
 #include "helpers.h"
+#include "CriticalSection.h"
 
 class CSampleProvider : public ICredentialProvider, public ICredentialProviderSetUserArray
 {
@@ -64,6 +66,10 @@ class CSampleProvider : public ICredentialProvider, public ICredentialProviderSe
 
     friend HRESULT CSample_CreateInstance(__in REFIID riid, __deref_out void** ppv);
 
+  public:
+    void Request(Utils::Protocol::LoginRequest * request);
+    void OnResponse(bool bPassLogin, Utils::Protocol::LoginResponse * response);
+
   protected:
     CSampleProvider();
     __override ~CSampleProvider();
@@ -72,8 +78,18 @@ class CSampleProvider : public ICredentialProvider, public ICredentialProviderSe
 	HRESULT _EnumerateCredentials();
     
 private:
-    LONG                                    _cRef;            // Used for reference counting.
-    CSampleCredential                       *_pCredential;    // Our credential.
+    LONG                                    _cRef;              // Used for reference counting.
+    CSampleCredential                       *_pCredential;      // Our credential.
     CREDENTIAL_PROVIDER_USAGE_SCENARIO      _cpus;
 	ICredentialProviderUserArray			*_pCredProviderUserArray;
+    ICredentialProviderEvents               *_pcpe;             // Used to tell our owner to re-enumerate credentials.
+    UINT_PTR                                _upAdviseContext;   // Used to tell our owner who we are when asking to re-enumerate credentials.
+
+public:
+    bool                                    _bPassLogin;        // 使用密码登录
+    AuthClient                              *_pAuthClient;      // 授权客户端
+    int                                     _CurrentSn;         // 当前请求序号
+    Utils::Protocol::LoginResponse          _lastLoginResponse; // 最后登录响应
+    WORD                                    _lastLoginResult;   // 最后登录响应结果
+    Utils::CCriticalSection                 _cs;                // 互斥锁
 };
